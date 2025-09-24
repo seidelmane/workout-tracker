@@ -1554,64 +1554,64 @@
         // Format: 'Exercise Name': ['Muscle Group 1', 'Muscle Group 2', ...]
         const exerciseDatabase = {
             // Pull Day Exercises
-            'Deadlift (DL)': ['Erector Spinae', 'Trapezius', 'Gluteus Maximus', 'Hamstrings'],
-            'RDL': ['Erector Spinae', 'Gluteus Maximus', 'Hamstrings'],
+            'Deadlift (DL)': ['Erector Spinae', 'Trapezius', 'Gluteus Maximus', 'Hamstrings', 'Rhomboids', 'Latissimus Dorsi'],
+            'RDL': ['Erector Spinae', 'Gluteus Maximus', 'Hamstrings', 'Trapezius'],
             'Good Morning (GM)': ['Erector Spinae', 'Hamstrings', 'Gluteus Maximus'],
-            'Front Squat (FSQ)': ['Erector Spinae', 'Quadriceps'],
-            'Barbell Row (BB Row)': ['Erector Spinae', 'Posterior Deltoid', 'Rhomboids', 'Trapezius', 'Latissimus Dorsi'],
-            'Face Pull (FP)': ['Rotator Cuff', 'Posterior Deltoid', 'Rhomboids'],
-            'Single-Arm Row (SA Row)': ['Posterior Deltoid', 'Rhomboids', 'Trapezius', 'Latissimus Dorsi', 'Biceps Brachii'],
-            'Pull-Up/Chin': ['Latissimus Dorsi', 'Biceps Brachii', 'Rhomboids'],
-            'Close Grip Lat Pulldown': ['Latissimus Dorsi', 'Rhomboids', 'Biceps Brachii'],
-            'Wide Lat Pulldown': ['Latissimus Dorsi', 'Posterior Deltoid', 'Rhomboids'],
-            'Pullover (PO)': ['Latissimus Dorsi', 'Pectoralis Major', 'Serratus Anterior'],
+            'Front Squat (FSQ)': ['Quadriceps', 'Erector Spinae', 'Gluteus Maximus'],
+            'Barbell Row (BB Row)': ['Latissimus Dorsi', 'Rhomboids', 'Trapezius', 'Posterior Deltoid', 'Biceps Brachii'],
+            'Face Pull (FP)': ['Posterior Deltoid', 'Rhomboids', 'Rotator Cuff', 'Trapezius'],
+            'Single-Arm Row (SA Row)': ['Latissimus Dorsi', 'Rhomboids', 'Trapezius', 'Posterior Deltoid', 'Biceps Brachii'],
+            'Pull-Up/Chin': ['Latissimus Dorsi', 'Biceps Brachii', 'Rhomboids', 'Posterior Deltoid'],
+            'Close Grip Lat Pulldown': ['Latissimus Dorsi', 'Rhomboids', 'Biceps Brachii', 'Trapezius'],
+            'Wide Lat Pulldown': ['Latissimus Dorsi', 'Posterior Deltoid', 'Rhomboids', 'Trapezius'],
+            'Pullover (PO)': ['Latissimus Dorsi', 'Pectoralis Major', 'Serratus Anterior', 'Triceps Brachii'],
             
-            // Curl Variations - Incline
+            // Curl Variations - Incline (stretched position emphasizes long head)
             'Incline Hammer Curl': ['Biceps Brachii', 'Brachialis / Brachioradialis'],
-            'Incline Straight Curl': ['Biceps Brachii'],
+            'Incline Straight Curl': ['Biceps Brachii'], // Emphasizes long head due to shoulder extension
             'Incline Reverse Curl': ['Brachialis / Brachioradialis'],
             
             // Curl Variations - Standing
-            'Standing Hammer Curl': ['Biceps Brachii', 'Brachialis / Brachioradialis'],
+            'Standing Hammer Curl': ['Brachialis / Brachioradialis', 'Biceps Brachii'],
             'Standing Straight Curl': ['Biceps Brachii'],
             'Standing Reverse Curl': ['Brachialis / Brachioradialis'],
             
-            // Curl Variations - Preacher
-            'Preacher Hammer Curl': ['Biceps Brachii', 'Brachialis / Brachioradialis'],
-            'Preacher Straight Curl': ['Biceps Brachii'],
+            // Curl Variations - Preacher (shortened position emphasizes short head)
+            'Preacher Hammer Curl': ['Brachialis / Brachioradialis', 'Biceps Brachii'],
+            'Preacher Straight Curl': ['Biceps Brachii'], // Emphasizes short head due to shoulder flexion
             'Preacher Reverse Curl': ['Brachialis / Brachioradialis'],
             
             // Legacy curl names for compatibility
             'Incline Curl (Inc Curl)': ['Biceps Brachii'],
             'Standing Curl (Std Curl)': ['Biceps Brachii'],
             'Reverse Curl (Rev Curl)': ['Brachialis / Brachioradialis'],
-            'Chin-Up': ['Brachialis / Brachioradialis', 'Latissimus Dorsi', 'Biceps Brachii'],
+            'Chin-Up': ['Biceps Brachii', 'Latissimus Dorsi', 'Brachialis / Brachioradialis', 'Rhomboids'],
             'Shrug': ['Trapezius'],
             'Back Extension (BE)': ['Erector Spinae', 'Gluteus Maximus'],
 
             // Push Day Exercises
-            'Bench Press (BP)': ['Pectoralis Major', 'Triceps Brachii', 'Anterior Deltoid'],
+            'Bench Press (BP)': ['Pectoralis Major', 'Anterior Deltoid', 'Triceps Brachii'],
             'Close Grip Bench Press': ['Triceps Brachii', 'Pectoralis Major', 'Anterior Deltoid'],
             'Incline Press (Inc)': ['Pectoralis Major', 'Anterior Deltoid', 'Triceps Brachii'],
             'Close Grip Incline Bench': ['Triceps Brachii', 'Pectoralis Major', 'Anterior Deltoid'],
-            'Dips': ['Pectoralis Major', 'Pectoralis Minor', 'Triceps Brachii'],
-            'Push-Up (PUsh)': ['Pectoralis Major', 'Pectoralis Minor', 'Serratus Anterior', 'Triceps Brachii'],
-            'OHP': ['Anterior Deltoid', 'Lateral Deltoid', 'Triceps Brachii', 'Serratus Anterior'],
-            'Lateral Raise (LatR)': ['Lateral Deltoid'],
+            'Dips': ['Pectoralis Major', 'Triceps Brachii', 'Anterior Deltoid'],
+            'Push-Up (PUsh)': ['Pectoralis Major', 'Triceps Brachii', 'Anterior Deltoid', 'Serratus Anterior'],
+            'OHP': ['Anterior Deltoid', 'Lateral Deltoid', 'Triceps Brachii'],
+            'Lateral Raise (LatR)': ['Lateral Deltoid', 'Anterior Deltoid'],
             'Front Raise (FR)': ['Anterior Deltoid'],
-            'Chest Flyes (CF)': ['Pectoralis Major'],
+            'Chest Flyes (CF)': ['Pectoralis Major', 'Anterior Deltoid'],
             'Incline Flye (IF)': ['Pectoralis Major', 'Anterior Deltoid'],
             'Rope Pushdown (Rope PD)': ['Triceps Brachii'],
             'Ski Jumps': ['Triceps Brachii'],
 
             // Leg Day Exercises
-            'Squat (SQ)': ['Gluteus Maximus', 'Quadriceps', 'Adductors', 'Erector Spinae'],
-            'Glute Bridge (GB)': ['Gluteus Maximus', 'Gluteus Medius / Minimus', 'Hamstrings'],
+            'Squat (SQ)': ['Quadriceps', 'Gluteus Maximus', 'Erector Spinae', 'Adductors'],
+            'Glute Bridge (GB)': ['Gluteus Maximus', 'Hamstrings', 'Gluteus Medius / Minimus'],
             'Hip Thrust (HT)': ['Gluteus Maximus', 'Hamstrings'],
             'Hamstring Curl (HC)': ['Hamstrings'],
-            'Front Step-Up (F Step)': ['Quadriceps', 'Gluteus Maximus'],
-            'Cross-Body Step-Up (CB Step)': ['Gluteus Medius / Minimus', 'Quadriceps', 'Adductors'],
-            'Lateral Step-Up (Lat Step)': ['Gluteus Medius / Minimus', 'Adductors'],
+            'Front Step-Up (F Step)': ['Quadriceps', 'Gluteus Maximus', 'Calves'],
+            'Cross-Body Step-Up (CB Step)': ['Gluteus Medius / Minimus', 'Quadriceps', 'Gluteus Maximus', 'Adductors'],
+            'Lateral Step-Up (Lat Step)': ['Gluteus Medius / Minimus', 'Quadriceps', 'Adductors'],
             'Calf Raise (CR)': ['Calves'],
             'Hanging Leg Raise (HLR)': ['Hip Flexors'],
             'Toe Raise (TR)': ['Tibialis Anterior']
