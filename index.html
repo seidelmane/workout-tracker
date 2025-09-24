@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>💪 Workout Tracker</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="💪 Workout Tracker">
+    <meta name="theme-color" content="#4facfe">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Enhanced iOS Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' style='stop-color:%234facfe'/%3E%3Cstop offset='100%25' style='stop-color:%2300f2fe'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='url(%23bg)'/%3E%3Ctext x='90' y='110' text-anchor='middle' font-size='60' fill='white'%3E💪%3C/text%3E%3C/svg%3E">
+    
+    <!-- Prevent zooming and improve mobile behavior -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    
+    <!-- GitHub Pages specific -->
+    <base href="./">
+</head>
+<body>
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 400px;">
+            <div style="font-size: 64px; margin-bottom: 20px;">💪</div>
+            <h1 style="color: #333; margin-bottom: 10px;">Workout Tracker</h1>
+            <p style="color: #666; margin-bottom: 30px;">Choose your preferred version:</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <a href="workout-tracker.html" style="background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 15px 20px; border-radius: 10px; text-decoration: none; font-weight: bold;">
+                    📱 Full Tracker (Recommended)
+                </a>
+                <a href="workout-tracker-unified.html" style="background: linear-gradient(45deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 10px; text-decoration: none; font-weight: bold;">
+                    🎯 Simple Session Tracker
+                </a>
+                <a href="workout-settings.html" style="background: linear-gradient(45deg, #28a745 0%, #20c997 100%); color: white; padding: 15px 20px; border-radius: 10px; text-decoration: none; font-weight: bold;">
+                    ⚙️ Settings & Configuration
+                </a>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; font-size: 14px; color: #666;">
+                <strong>📱 Install as iPhone App:</strong><br>
+                1. Open in Safari<br>
+                2. Tap Share (📤)<br>
+                3. "Add to Home Screen"<br>
+                4. Works like native app!
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center; color: rgba(255,255,255,0.8); font-size: 12px;">
+            <p>🏋️ Track your hypertrophy progress with precision</p>
+            <p>✨ Offline-capable • iPhone optimized • No tracking</p>
+        </div>
+    </div>
+</body>
+</html>

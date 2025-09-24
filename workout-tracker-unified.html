@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Tracker</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Workout Tracker">
+    <meta name="theme-color" content="#4facfe">
+    
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            padding-bottom: 80px; /* Space for tabs */
+        }
+
+        /* Tab Navigation */
+        .tab-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #ddd;
+            display: flex;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 15px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: #4facfe;
+            background: #f0f8ff;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        /* Workout Session Panel */
+        .session-panel {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .session-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .session-time {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .current-exercises {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            min-height: 100px;
+        }
+
+        .exercise-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .exercise-entry:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .exercise-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .exercise-info {
+            flex: 1;
+        }
+
+        .exercise-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .exercise-details {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .exercise-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-small:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .session-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-session {
+            flex: 1;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-session:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-session.primary {
+            background: rgba(255,255,255,0.9);
+            color: #4CAF50;
+        }
+
+        .empty-session {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
+        }
+
+        /* Input sections */
+        .input-section {
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .input-row .form-group {
+            flex: 1;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Muscle group displays */
+        .muscle-groups {
+            padding: 25px;
+        }
+
+        .muscle-groups h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .muscle-group {
+            margin-bottom: 30px;
+        }
+
+        .muscle-group h4 {
+            color: #4facfe;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .muscle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .muscle-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .muscle-item.fresh {
+            border-left-color: #28a745;
+        }
+
+        .muscle-item.moderate {
+            border-left-color: #ffc107;
+        }
+
+        .muscle-item.stale {
+            border-left-color: #dc3545;
+        }
+
+        .muscle-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .muscle-stats {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: all 0.5s ease;
+        }
+
+        .progress-under {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+        .progress-moderate {
+            background: linear-gradient(45deg, #ffc107, #e0a800);
+        }
+
+        .progress-good {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                padding-bottom: 80px;
+            }
+            
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: calc(100vh - 20px);
+            }
+            
+            .session-panel {
+                margin: 10px;
+            }
+        }
+
+        /* Settings page styles */
+        .settings-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .settings-content {
+            padding: 30px;
+        }
+
+        .settings-section {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .settings-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            border-bottom: 2px solid #4facfe;
+            padding-bottom: 8px;
+        }
+
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .target-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .target-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            flex: 1;
+        }
+
+        .target-input {
+            width: 60px;
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Tab Navigation -->
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="showPage('tracker')">🏋️ Tracker</button>
+        <button class="tab-btn" onclick="showPage('settings')">⚙️ Settings</button>
+    </div>
+
+    <!-- Tracker Page -->
+    <div id="tracker" class="page active">
+        <div class="container">
+            <div class="header">
+                <h1>🏋️ Workout Tracker</h1>
+                <p>Track your hypertrophy progress with precision</p>
+            </div>
+
+            <!-- Workout Session Panel -->
+            <div class="session-panel" id="sessionPanel">
+                <div class="session-header">
+                    <div class="session-title" id="sessionTitle">Today's Workout Session</div>
+                    <div class="session-time" id="sessionTime"></div>
+                </div>
+                
+                <div class="current-exercises" id="currentExercises">
+                    <div class="empty-session" id="emptySession">
+                        No exercises added yet. Start building your workout!
+                    </div>
+                </div>
+                
+                <div class="session-controls">
+                    <button class="btn-session" onclick="clearSession()">🗑️ Clear</button>
+                    <button class="btn-session primary" onclick="completeWorkout()">✅ Complete Workout</button>
+                </div>
+            </div>
+
+            <!-- Exercise Input -->
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="exercise">Exercise:</label>
+                    <select id="exercise">
+                        <option value="">Select an exercise...</option>
+                    </select>
+                </div>
+                
+                <div class="input-row">
+                    <div class="form-group">
+                        <label for="sets">Sets:</label>
+                        <input type="number" id="sets" min="1" max="20" value="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="reps">Reps:</label>
+                        <input type="number" id="reps" min="1" max="50" value="8">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="addToSession()">Add to Session</button>
+            </div>
+
+            <!-- Muscle Groups Display -->
+            <div class="muscle-groups">
+                <h3>📊 Weekly Progress</h3>
+                
+                <div class="muscle-group">
+                    <h4>🔽 Pull Muscles</h4>
+                    <div class="muscle-grid" id="pullMuscles"></div>
+                </div>
+                
+                <div class="muscle-group">
+                    <h4>🔼 Push Muscles</h4>
+                    <div class="muscle-grid" id="pushMuscles"></div>
+                </div>
+                
+                <div class="muscle-group">
+                    <h4>🦵 Leg Muscles</h4>
+                    <div class="muscle-grid" id="legMuscles"></div>
+                </div>
+                
+                <div class="muscle-group">
+                    <h4>💪 Arm Muscles</h4>
+                    <div class="muscle-grid" id="armMuscles"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="settings" class="page">
+        <div class="settings-container">
+            <div class="header">
+                <h1>⚙️ Workout Settings</h1>
+                <p>Customize your targets, exercises, and muscle mappings</p>
+            </div>
+
+            <div class="settings-content">
+                <div class="settings-section">
+                    <h3>🎯 Weekly Volume Targets</h3>
+                    <div class="targets-grid" id="targetsGrid"></div>
+                    <button class="btn" onclick="saveTargets()">💾 Save Targets</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Workout Session System
+        let currentSession = [];
+        let sessionStartTime = null;
+
+        // Exercise Database - Complete with all exercises
+        const exerciseDatabase = {
+            // Pull Day Exercises
+            'Deadlift (DL)': ['Erector Spinae', 'Trapezius', 'Gluteus Maximus', 'Hamstrings'],
+            'RDL': ['Erector Spinae', 'Gluteus Maximus', 'Hamstrings'],
+            'Good Morning (GM)': ['Erector Spinae', 'Hamstrings', 'Gluteus Maximus'],
+            'Front Squat (FSQ)': ['Erector Spinae', 'Quadriceps'],
+            'Barbell Row (BB Row)': ['Erector Spinae', 'Posterior Deltoid', 'Rhomboids', 'Trapezius', 'Latissimus Dorsi'],
+            'Face Pull (FP)': ['Rotator Cuff', 'Posterior Deltoid', 'Rhomboids'],
+            'Single-Arm Row (SA Row)': ['Posterior Deltoid', 'Rhomboids', 'Trapezius', 'Latissimus Dorsi', 'Biceps Brachii'],
+            'Pull-Up/Chin': ['Latissimus Dorsi', 'Biceps Brachii', 'Rhomboids'],
+            'Pullover (PO)': ['Latissimus Dorsi', 'Pectoralis Major', 'Serratus Anterior'],
+            'Incline Curl (Inc Curl)': ['Biceps Brachii'],
+            'Standing Curl (Std Curl)': ['Biceps Brachii'],
+            'Reverse Curl (Rev Curl)': ['Brachialis / Brachioradialis'],
+            'Chin-Up': ['Brachialis / Brachioradialis', 'Latissimus Dorsi', 'Biceps Brachii'],
+            'Shrug': ['Trapezius'],
+            'Back Extension (BE)': ['Erector Spinae', 'Gluteus Maximus'],
+
+            // Push Day Exercises
+            'Bench Press (BP)': ['Pectoralis Major', 'Triceps Brachii', 'Anterior Deltoid'],
+            'Incline Press (Inc)': ['Pectoralis Major', 'Anterior Deltoid', 'Triceps Brachii'],
+            'Dips': ['Pectoralis Major', 'Pectoralis Minor', 'Triceps Brachii'],
+            'Push-Up (PUsh)': ['Pectoralis Major', 'Pectoralis Minor', 'Serratus Anterior', 'Triceps Brachii'],
+            'OHP': ['Anterior Deltoid', 'Lateral Deltoid', 'Triceps Brachii', 'Serratus Anterior'],
+            'Lateral Raise (LatR)': ['Lateral Deltoid'],
+            'Front Raise (FR)': ['Anterior Deltoid'],
+            'Chest Flyes (CF)': ['Pectoralis Major'],
+            'Incline Flye (IF)': ['Pectoralis Major', 'Anterior Deltoid'],
+            'Rope Pushdown (Rope PD)': ['Triceps Brachii'],
+            'Ski Jumps': ['Triceps Brachii'],
+
+            // Leg Day Exercises
+            'Squat (SQ)': ['Gluteus Maximus', 'Quadriceps', 'Adductors', 'Erector Spinae'],
+            'Glute Bridge (GB)': ['Gluteus Maximus', 'Gluteus Medius / Minimus', 'Hamstrings'],
+            'Hip Thrust (HT)': ['Gluteus Maximus', 'Hamstrings'],
+            'Hamstring Curl (HC)': ['Hamstrings'],
+            'Front Step-Up (F Step)': ['Quadriceps', 'Gluteus Maximus'],
+            'Cross-Body Step-Up (CB Step)': ['Gluteus Medius / Minimus', 'Quadriceps', 'Adductors'],
+            'Lateral Step-Up (Lat Step)': ['Gluteus Medius / Minimus', 'Adductors'],
+            'Calf Raise (CR)': ['Calves'],
+            'Hanging Leg Raise (HLR)': ['Hip Flexors'],
+            'Toe Raise (TR)': ['Tibialis Anterior']
+        };
+
+        // Exercise groupings for organized dropdowns
+        const exerciseGroups = {
+            'PULL DAY EXERCISES': {
+                'Deadlifts & Variations': ['Deadlift (DL)', 'RDL', 'Good Morning (GM)', 'Front Squat (FSQ)'],
+                'Rows': ['Barbell Row (BB Row)', 'Single-Arm Row (SA Row)'],
+                'Pull-ups & Chins': ['Pull-Up/Chin', 'Chin-Up'],
+                'Specialized Pulls': ['Face Pull (FP)', 'Pullover (PO)', 'Shrug'],
+                'Back Extensions': ['Back Extension (BE)'],
+                'Bicep Curls': ['Incline Curl (Inc Curl)', 'Standing Curl (Std Curl)', 'Reverse Curl (Rev Curl)']
+            },
+            'PUSH DAY EXERCISES': {
+                'Pressing': ['Bench Press (BP)', 'Incline Press (Inc)', 'OHP'],
+                'Bodyweight Push': ['Dips', 'Push-Up (PUsh)'],
+                'Shoulder Isolation': ['Lateral Raise (LatR)', 'Front Raise (FR)'],
+                'Chest Isolation': ['Chest Flyes (CF)', 'Incline Flye (IF)'],
+                'Tricep Work': ['Rope Pushdown (Rope PD)', 'Ski Jumps']
+            },
+            'LEG DAY EXERCISES': {
+                'Squats & Variants': ['Squat (SQ)', 'Front Squat (FSQ)'],
+                'Step-ups': ['Front Step-Up (F Step)', 'Cross-Body Step-Up (CB Step)', 'Lateral Step-Up (Lat Step)'],
+                'Glute & Hip Work': ['Glute Bridge (GB)', 'Hip Thrust (HT)'],
+                'Hamstring Work': ['Hamstring Curl (HC)', 'RDL', 'Good Morning (GM)'],
+                'Lower Leg': ['Calf Raise (CR)', 'Toe Raise (TR)'],
+                'Core/Hip': ['Hanging Leg Raise (HLR)']
+            }
+        };
+
+        // Muscle Groups
+        const muscleGroups = {
+            pull: ['Erector Spinae', 'Rotator Cuff', 'Posterior Deltoid', 'Rhomboids', 'Trapezius', 'Latissimus Dorsi', 'Biceps Brachii', 'Brachialis / Brachioradialis'],
+            push: ['Pectoralis Major', 'Pectoralis Minor', 'Serratus Anterior', 'Anterior Deltoid', 'Lateral Deltoid', 'Triceps Brachii'],
+            leg: ['Gluteus Maximus', 'Gluteus Medius / Minimus', 'Quadriceps', 'Hamstrings', 'Adductors', 'Calves', 'Hip Flexors', 'Tibialis Anterior'],
+            arms: ['Triceps Brachii', 'Biceps Brachii', 'Brachialis / Brachioradialis']
+        };
+
+        // Data storage
+        let muscleData = {};
+        let weeklyTargets = {
+            'Erector Spinae': 12,
+            'Rotator Cuff': 8,
+            'Posterior Deltoid': 12,
+            'Rhomboids': 10,
+            'Trapezius': 12,
+            'Latissimus Dorsi': 16,
+            'Biceps Brachii': 14,
+            'Brachialis / Brachioradialis': 10,
+            'Pectoralis Major': 18,
+            'Pectoralis Minor': 8,
+            'Serratus Anterior': 8,
+            'Anterior Deltoid': 12,
+            'Lateral Deltoid': 14,
+            'Triceps Brachii': 16,
+            'Gluteus Maximus': 16,
+            'Gluteus Medius / Minimus': 10,
+            'Quadriceps': 18,
+            'Hamstrings': 12,
+            'Adductors': 8,
+            'Calves': 12,
+            'Hip Flexors': 6,
+            'Tibialis Anterior': 4
+        };
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function addToSession() {
+            const exercise = document.getElementById('exercise').value;
+            const sets = parseInt(document.getElementById('sets').value);
+            const reps = parseInt(document.getElementById('reps').value);
+
+            if (!exercise || !sets || !reps) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (!sessionStartTime) {
+                sessionStartTime = new Date();
+                updateSessionTime();
+            }
+
+            const sessionEntry = {
+                id: Date.now(),
+                exercise: exercise,
+                sets: sets,
+                reps: reps,
+                muscles: exerciseDatabase[exercise] || [],
+                timestamp: new Date()
+            };
+
+            currentSession.push(sessionEntry);
+            updateSessionDisplay();
+            updatePreviewMuscles();
+            
+            // Clear inputs
+            document.getElementById('exercise').value = '';
+            document.getElementById('sets').value = '3';
+            document.getElementById('reps').value = '8';
+        }
+
+        function updateSessionDisplay() {
+            const container = document.getElementById('currentExercises');
+            const emptyState = document.getElementById('emptySession');
+            
+            if (currentSession.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            container.innerHTML = currentSession.map((entry, index) => `
+                <div class="exercise-entry">
+                    <div class="exercise-info">
+                        <div class="exercise-name">${entry.exercise}</div>
+                        <div class="exercise-details">${entry.sets} sets × ${entry.reps} reps</div>
+                    </div>
+                    <div class="exercise-actions">
+                        <button class="btn-small" onclick="editSessionEntry(${index})">✏️</button>
+                        <button class="btn-small" onclick="removeSessionEntry(${index})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editSessionEntry(index) {
+            const entry = currentSession[index];
+            const newSets = prompt('Enter sets:', entry.sets);
+            const newReps = prompt('Enter reps:', entry.reps);
+            
+            if (newSets && newReps) {
+                currentSession[index].sets = parseInt(newSets);
+                currentSession[index].reps = parseInt(newReps);
+                updateSessionDisplay();
+                updatePreviewMuscles();
+            }
+        }
+
+        function removeSessionEntry(index) {
+            currentSession.splice(index, 1);
+            updateSessionDisplay();
+            updatePreviewMuscles();
+        }
+
+        function clearSession() {
+            if (currentSession.length > 0 && confirm('Clear current workout session?')) {
+                currentSession = [];
+                sessionStartTime = null;
+                updateSessionDisplay();
+                updatePreviewMuscles();
+                document.getElementById('sessionTime').textContent = '';
+            }
+        }
+
+        function completeWorkout() {
+            if (currentSession.length === 0) {
+                alert('No exercises in current session');
+                return;
+            }
+
+            if (confirm(`Complete workout with ${currentSession.length} exercises?`)) {
+                // Apply session to actual muscle data
+                currentSession.forEach(entry => {
+                    entry.muscles.forEach(muscle => {
+                        if (!muscleData[muscle]) {
+                            muscleData[muscle] = { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
+                        }
+                        muscleData[muscle].sets += entry.sets;
+                        muscleData[muscle].reps += entry.reps;
+                        muscleData[muscle].lastWorked = new Date().toISOString();
+                    });
+                });
+
+                // Save to localStorage
+                localStorage.setItem('workoutData', JSON.stringify(muscleData));
+                
+                // Clear session
+                currentSession = [];
+                sessionStartTime = null;
+                updateSessionDisplay();
+                updateMuscleDisplays();
+                
+                alert('Workout completed and saved!');
+            }
+        }
+
+        function updateSessionTime() {
+            if (sessionStartTime) {
+                const now = new Date();
+                const elapsed = Math.floor((now - sessionStartTime) / 1000 / 60);
+                document.getElementById('sessionTime').textContent = `Started ${elapsed} min ago`;
+            }
+        }
+
+        function updatePreviewMuscles() {
+            // Create preview of what muscle data would look like
+            // This updates the display in real-time as user builds session
+            const previewData = JSON.parse(JSON.stringify(muscleData));
+            
+            currentSession.forEach(entry => {
+                entry.muscles.forEach(muscle => {
+                    if (!previewData[muscle]) {
+                        previewData[muscle] = { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
+                    }
+                    previewData[muscle].sets += entry.sets;
+                    previewData[muscle].reps += entry.reps;
+                });
+            });
+            
+            updateMuscleDisplays(previewData);
+        }
+
+        function updateMuscleDisplays(dataToShow = muscleData) {
+            updateMuscleGroup('pullMuscles', muscleGroups.pull, dataToShow);
+            updateMuscleGroup('pushMuscles', muscleGroups.push, dataToShow);
+            updateMuscleGroup('legMuscles', muscleGroups.leg, dataToShow);
+            updateMuscleGroup('armMuscles', muscleGroups.arms, dataToShow);
+        }
+
+        function updateMuscleGroup(containerId, muscles, dataToShow) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = muscles.map(muscle => {
+                const data = dataToShow[muscle] || { sets: 0, reps: 0, lastWorked: null };
+                const target = weeklyTargets[muscle] || 12;
+                const progress = Math.min((data.sets / target) * 100, 100);
+                
+                let progressClass = 'progress-under';
+                if (progress >= 80) progressClass = 'progress-good';
+                else if (progress >= 50) progressClass = 'progress-moderate';
+                
+                return `
+                    <div class="muscle-item">
+                        <div class="muscle-name">${muscle}</div>
+                        <div class="muscle-stats">${data.sets}/${target} sets • ${data.reps} reps</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${progressClass}" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function populateExerciseDropdown() {
+            const select = document.getElementById('exercise');
+            select.innerHTML = '<option value="">Select an exercise...</option>';
+            
+            Object.entries(exerciseGroups).forEach(([category, groups]) => {
+                Object.entries(groups).forEach(([groupName, exercises]) => {
+                    // Add group header with category prefix for clarity
+                    const groupHeader = document.createElement('optgroup');
+                    groupHeader.label = `${category} - ${groupName}`;
+                    
+                    exercises.forEach(exercise => {
+                        // Only add exercises that exist in the database
+                        if (exerciseDatabase[exercise]) {
+                            const option = document.createElement('option');
+                            option.value = exercise;
+                            option.textContent = exercise;
+                            groupHeader.appendChild(option);
+                        }
+                    });
+                    
+                    // Only add the group if it has exercises
+                    if (groupHeader.children.length > 0) {
+                        select.appendChild(groupHeader);
+                    }
+                });
+            });
+        }
+
+        function initMuscleData() {
+            Object.values(muscleGroups).flat().forEach(muscle => {
+                if (!muscleData[muscle]) {
+                    muscleData[muscle] = { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
+                }
+            });
+        }
+
+        function saveTargets() {
+            localStorage.setItem('workoutTargets', JSON.stringify(weeklyTargets));
+            alert('Targets saved!');
+        }
+
+        // Initialize app
+        function init() {
+            const savedData = localStorage.getItem('workoutData');
+            if (savedData) {
+                muscleData = JSON.parse(savedData);
+            }
+            
+            const savedTargets = localStorage.getItem('workoutTargets');
+            if (savedTargets) {
+                weeklyTargets = JSON.parse(savedTargets);
+            }
+            
+            initMuscleData();
+            populateExerciseDropdown();
+            updateMuscleDisplays();
+            
+            // Update session time every minute
+            setInterval(updateSessionTime, 60000);
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,2660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>💪 Workout Tracker</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="💪 Workout Tracker">
+    <meta name="theme-color" content="#4facfe">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Enhanced iOS Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' style='stop-color:%234facfe'/%3E%3Cstop offset='100%25' style='stop-color:%2300f2fe'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='url(%23bg)'/%3E%3Ctext x='90' y='110' text-anchor='middle' font-size='60' fill='white'%3E💪%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" sizes="152x152" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 152 152'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' style='stop-color:%234facfe'/%3E%3Cstop offset='100%25' style='stop-color:%2300f2fe'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='152' height='152' rx='34' fill='url(%23bg)'/%3E%3Ctext x='76' y='95' text-anchor='middle' font-size='50' fill='white'%3E💪%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" sizes="120x120" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' style='stop-color:%234facfe'/%3E%3Cstop offset='100%25' style='stop-color:%2300f2fe'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='120' height='120' rx='27' fill='url(%23bg)'/%3E%3Ctext x='60' y='75' text-anchor='middle' font-size='40' fill='white'%3E💪%3C/text%3E%3C/svg%3E">
+    
+    <!-- iPhone Splash Screens -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-startup-image" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 375 812'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' style='stop-color:%234facfe'/%3E%3Cstop offset='100%25' style='stop-color:%2300f2fe'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='375' height='812' fill='url(%23bg)'/%3E%3Ctext x='187.5' y='400' text-anchor='middle' font-size='80' fill='white'%3E💪%3C/text%3E%3Ctext x='187.5' y='450' text-anchor='middle' font-size='24' fill='rgba(255,255,255,0.9)'%3EWorkout Tracker%3C/text%3E%3C/svg%3E" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+    
+    <!-- Prevent zooming and improve mobile behavior -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .input-section {
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .input-row .form-group {
+            flex: 1;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .stats-section {
+            padding: 25px;
+        }
+
+        .workout-type {
+            margin-bottom: 25px;
+            scroll-margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .workout-type.active-section {
+            background: rgba(79, 172, 254, 0.1);
+            border: 2px solid rgba(79, 172, 254, 0.3);
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.2);
+        }
+
+        .workout-type h3 {
+            color: #4facfe;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .muscle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .muscle-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #4facfe;
+            transition: all 0.3s;
+        }
+
+        .muscle-card:hover {
+            background: #e3f2fd;
+            transform: translateY(-2px);
+        }
+
+        .muscle-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .muscle-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        .muscle-progress {
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            font-size: 11px;
+            font-weight: bold;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sets-count {
+            color: #4facfe;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .reps-count {
+            color: #666;
+            font-size: 11px;
+        }
+
+        .today-badge {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .date-picker-section {
+            margin-bottom: 12px;
+        }
+
+        .date-toggle {
+            background: rgba(79, 172, 254, 0.1);
+            border: 1px solid #4facfe;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #4facfe;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+        }
+
+        .date-toggle:hover {
+            background: rgba(79, 172, 254, 0.2);
+        }
+
+        .date-toggle.expanded {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom: none;
+        }
+
+        .date-picker {
+            background: white;
+            border: 1px solid #4facfe;
+            border-top: none;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            padding: 12px;
+            display: none;
+        }
+
+        .date-picker.expanded {
+            display: block;
+        }
+
+        .date-picker input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .date-quick-buttons {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .date-quick-btn {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .date-quick-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .date-quick-btn.active {
+            background: #4facfe;
+            color: white;
+            border-color: #4facfe;
+        }
+
+        .targets-management {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .targets-note {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .settings-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .settings-link h4 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .settings-note {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .btn-settings {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+
+        .btn-settings:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .planning-mode {
+            background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 3px solid #ff5722;
+            animation: pulse 2s infinite;
+        }
+
+        .planning-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+            color: white;
+            padding: 8px 20px;
+            text-align: center;
+            z-index: 1000;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            animation: pulse 2s infinite;
+            box-shadow: 0 2px 10px rgba(255, 87, 34, 0.3);
+        }
+
+        .planning-bar.visible {
+            transform: translateY(0);
+        }
+
+        .planning-bar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .planning-bar-text {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .planning-bar-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-planning-small {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-planning-small:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .planning-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+            color: white;
+            padding: 8px 20px;
+            text-align: center;
+            z-index: 1000;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            animation: pulse 2s infinite;
+            box-shadow: 0 2px 10px rgba(255, 87, 34, 0.3);
+        }
+
+        .planning-bar.visible {
+            transform: translateY(0);
+        }
+
+        .planning-bar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .planning-bar-text {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .planning-bar-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-planning-small {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-planning-small:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 87, 34, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0); }
+        }
+
+        .planning-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .btn-planning {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-planning:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-commit {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border-color: #4CAF50;
+        }
+
+        .btn-revert {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            border-color: #f44336;
+        }
+
+        .btn-toggle-planning {
+            background: linear-gradient(45deg, #ff9800, #ff5722);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .btn-toggle-planning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+        }
+
+        .muscle-card.planned {
+            border: 2px solid #ff9800;
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 87, 34, 0.05));
+            position: relative;
+        }
+
+        .muscle-card.planned::before {
+            content: '📋 PLANNED';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff9800;
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .planning-badge {
+            background: #ff9800;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .freshness {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .recent-exercises {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .recent-exercises h4 {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .exercise-log {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .exercise-log:last-child {
+            border-bottom: none;
+        }
+
+        .clear-btn {
+            background: #ff6b6b;
+            margin-top: 15px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .export-import {
+            background: #f0f8ff;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 2px solid #4facfe;
+        }
+
+        .export-import h4 {
+            margin-bottom: 15px;
+            color: #4facfe;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .export-import textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-export {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-import {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-copy {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-small:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .section-nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .nav-btn {
+            padding: 8px 4px;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(45deg, #4CAF50 0%, #45a049 100%);
+        }
+
+        .section-nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .nav-btn {
+            padding: 8px 4px;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(45deg, #4CAF50 0%, #45a049 100%);
+        }
+
+        .workout-type {
+            margin-bottom: 25px;
+            scroll-margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .workout-type.active-section {
+            background: rgba(79, 172, 254, 0.1);
+            border: 2px solid rgba(79, 172, 254, 0.3);
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.2);
+        }
+
+        .section-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-input h4 {
+            margin-bottom: 15px;
+            color: #4facfe;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .section-form select,
+        .section-form input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .section-form select:focus,
+        .section-form input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .section-form .btn-small {
+            padding: 10px 8px;
+            font-size: 14px;
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .section-form .btn-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(79, 172, 254, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .emoji {
+            font-size: 20px;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(0); opacity: 1; }
+            to { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+        }
+
+        /* Confirmation Modal for Mobile */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .confirm-modal.visible {
+            display: flex;
+        }
+
+        .confirm-content {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 300px;
+            margin: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .confirm-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #f44336;
+            margin-bottom: 10px;
+        }
+
+        .confirm-message {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .confirm-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .confirm-btn.cancel {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .confirm-btn.confirm {
+            background: #f44336;
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* iPhone-specific optimizations */
+        @supports (padding: env(safe-area-inset-top)) {
+            body {
+                padding-top: env(safe-area-inset-top);
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+                padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Prevent iOS zoom on input focus */
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            input, select, textarea {
+                font-size: 16px; /* Prevents iOS zoom */
+            }
+        }
+
+        /* Improve touch targets for iPhone */
+        .btn, .btn-small, .nav-btn, .date-quick-btn {
+            min-height: 44px; /* iOS recommended minimum touch target */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .muscle-card {
+            min-height: 100px; /* Ensure adequate touch area */
+        }
+
+        /* iPhone notch and safe area support */
+        .planning-bar {
+            padding-top: calc(8px + env(safe-area-inset-top));
+            padding-left: calc(20px + env(safe-area-inset-left));
+            padding-right: calc(20px + env(safe-area-inset-right));
+        }
+
+        /* Enhanced mobile experience */
+        @media (max-width: 480px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+                box-shadow: none;
+            }
+            
+            body {
+                padding: 0;
+                background-attachment: fixed; /* Prevent background jumping on iOS */
+            }
+            
+            .header {
+                padding: max(25px, env(safe-area-inset-top) + 15px) 25px 25px;
+            }
+            
+            .section-form {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .planning-bar {
+                padding: 6px calc(15px + env(safe-area-inset-left)) 6px calc(15px + env(safe-area-inset-right));
+                padding-top: calc(6px + env(safe-area-inset-top));
+            }
+            
+            .planning-bar-content {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .planning-bar-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .btn-planning-small {
+                font-size: 11px;
+                padding: 3px 8px;
+                min-height: 32px;
+            }
+
+            /* Improve form usability on iPhone */
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .input-row .form-group {
+                flex: none;
+            }
+
+            /* Better modal sizing for iPhone */
+            .confirm-content {
+                max-width: calc(100vw - 40px);
+                margin: max(20px, env(safe-area-inset-top) + 10px) 20px;
+            }
+        }
+
+        /* iPhone X and newer with notch */
+        @media screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3),
+               screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
+               screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+            .header {
+                padding-top: max(25px, env(safe-area-inset-top) + 10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Confirmation Modal -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-content">
+            <div class="confirm-title" id="confirmTitle">⚠️ Confirm Action</div>
+            <div class="confirm-message" id="confirmMessage">Are you sure?</div>
+            <div class="confirm-buttons">
+                <button class="confirm-btn cancel" onclick="hideConfirmModal()">Cancel</button>
+                <button class="confirm-btn confirm" id="confirmButton" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Planning Bar -->
+    <div class="planning-bar" id="planningBar">
+        <div class="planning-bar-content">
+            <div class="planning-bar-text">
+                🎯 PLANNING MODE - Add exercises to preview your workout!
+            </div>
+            <div class="planning-bar-controls">
+                <button class="btn-planning-small" onclick="commitPlannedWorkout()" style="background: rgba(76, 175, 80, 0.8);">✅ I Did This</button>
+                <button class="btn-planning-small" onclick="revertPlannedWorkout()" style="background: rgba(244, 67, 54, 0.8);">❌ Just Planning</button>
+                <button class="btn-planning-small" onclick="togglePlanningMode()">📋 Exit</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>💪 Workout Tracker</h1>
+            <p>Track your sets and muscle group progress</p>
+        </div>
+
+        <div class="input-section">
+            <button class="btn-toggle-planning" onclick="togglePlanningMode()" id="planningToggle">
+                📋 Enter Planning Mode
+            </button>
+            
+            <div class="planning-mode" id="planningModeIndicator" style="display: none;">
+                <h4>🎯 PLANNING MODE ACTIVE</h4>
+                <p>Add exercises to see instant preview of your proposed workout!</p>
+                <div class="planning-controls">
+                    <button class="btn-planning btn-commit" onclick="commitPlannedWorkout()">✅ I Did This!</button>
+                    <button class="btn-planning btn-revert" onclick="revertPlannedWorkout()">❌ Just Planning</button>
+                    <button class="btn-planning" onclick="togglePlanningMode()">📋 Exit Planning</button>
+                </div>
+            </div>
+            
+            <form id="exerciseForm">
+                <div class="form-group">
+                    <label for="exercise">Exercise</label>
+                    <select id="exercise" required>
+                        <option value="">Select an exercise...</option>
+                    </select>
+                </div>
+                
+                <div class="input-row">
+                    <div class="form-group">
+                        <label for="sets">Sets</label>
+                        <input type="number" id="sets" required inputmode="numeric">
+                    </div>
+                    <div class="form-group">
+                        <label for="reps">Reps</label>
+                        <input type="number" id="reps" min="1" required inputmode="numeric">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">Add Exercise</button>
+            </form>
+        </div>
+
+        <div class="stats-section">
+            <div class="section-nav">
+                <div class="nav-buttons">
+                    <button class="nav-btn" onclick="scrollToSection('pull')">⬇️ Pull</button>
+                    <button class="nav-btn" onclick="scrollToSection('push')">⬆️ Push</button>
+                    <button class="nav-btn" onclick="scrollToSection('leg')">🦵 Leg</button>
+                    <button class="nav-btn" onclick="scrollToSection('arms')">💪 Arms</button>
+                </div>
+            </div>
+
+            <div class="workout-type" id="pull-section">
+                <h3><span class="emoji">⬇️</span> Pull Day - Back & Biceps</h3>
+                
+                <div class="section-input">
+                    <h4>⬇️ Add Pull Exercise</h4>
+                    
+                    <div class="date-picker-section">
+                        <div class="date-toggle" onclick="toggleDatePicker('pull')">
+                            <span id="pull-date-display">📅 Today</span>
+                            <span id="pull-date-arrow">▼</span>
+                        </div>
+                        <div class="date-picker" id="pull-date-picker">
+                            <input type="date" id="pull-date-input" onchange="updateDateDisplay('pull')">
+                            <div class="date-quick-buttons">
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('pull', 0)">Today</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('pull', 1)">Yesterday</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('pull', 2)">2 days ago</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('pull', 3)">3 days ago</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form class="section-form" data-section="pull">
+                        <select required>
+                            <option value="">Select pull exercise...</option>
+                            <optgroup label="Deadlifts & Variations">
+                                <option value="Deadlift (DL)">Deadlift (DL)</option>
+                                <option value="RDL">RDL</option>
+                                <option value="Good Morning (GM)">Good Morning (GM)</option>
+                            </optgroup>
+                            <optgroup label="Rows">
+                                <option value="Barbell Row (BB Row)">Barbell Row (BB Row)</option>
+                                <option value="Single-Arm Row (SA Row)">Single-Arm Row (SA Row)</option>
+                            </optgroup>
+                            <optgroup label="Pull-ups & Chins">
+                                <option value="Pull-Up/Chin">Pull-Up/Chin</option>
+                                <option value="Chin-Up">Chin-Up</option>
+                            </optgroup>
+                            <optgroup label="Specialized Pulls">
+                                <option value="Face Pull (FP)">Face Pull (FP)</option>
+                                <option value="Pullover (PO)">Pullover (PO)</option>
+                                <option value="Shrug">Shrug</option>
+                            </optgroup>
+                            <optgroup label="Bicep Curls">
+                                <option value="Incline Curl (Inc Curl)">Incline Curl (Inc Curl)</option>
+                                <option value="Standing Curl (Std Curl)">Standing Curl (Std Curl)</option>
+                                <option value="Reverse Curl (Rev Curl)">Reverse Curl (Rev Curl)</option>
+                            </optgroup>
+                        </select>
+                        <input type="number" placeholder="Sets" required inputmode="numeric">
+                        <input type="number" placeholder="Reps" min="1" required inputmode="numeric">
+                        <button type="submit" class="btn-small">Add</button>
+                    </form>
+                </div>
+                
+                <div class="muscle-grid" id="pullMuscles"></div>
+            </div>
+
+            <div class="workout-type" id="push-section">
+                <h3><span class="emoji">⬆️</span> Push Day - Chest, Shoulders & Triceps</h3>
+                
+                <div class="section-input">
+                    <h4>⬆️ Add Push Exercise</h4>
+                    
+                    <div class="date-picker-section">
+                        <div class="date-toggle" onclick="toggleDatePicker('push')">
+                            <span id="push-date-display">📅 Today</span>
+                            <span id="push-date-arrow">▼</span>
+                        </div>
+                        <div class="date-picker" id="push-date-picker">
+                            <input type="date" id="push-date-input" onchange="updateDateDisplay('push')">
+                            <div class="date-quick-buttons">
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('push', 0)">Today</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('push', 1)">Yesterday</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('push', 2)">2 days ago</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('push', 3)">3 days ago</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form class="section-form" data-section="push">
+                        <select required>
+                            <option value="">Select push exercise...</option>
+                            <optgroup label="Pressing">
+                                <option value="Bench Press (BP)">Bench Press (BP)</option>
+                                <option value="Incline Press (Inc)">Incline Press (Inc)</option>
+                                <option value="OHP">OHP</option>
+                            </optgroup>
+                            <optgroup label="Bodyweight Push">
+                                <option value="Dips">Dips</option>
+                                <option value="Push-Up (PUsh)">Push-Up (PUsh)</option>
+                            </optgroup>
+                            <optgroup label="Shoulder Isolation">
+                                <option value="Lateral Raise (LatR)">Lateral Raise (LatR)</option>
+                            </optgroup>
+                            <optgroup label="Tricep Work">
+                                <option value="Rope Pushdown (Rope PD)">Rope Pushdown (Rope PD)</option>
+                                <option value="Ski Jumps">Ski Jumps</option>
+                            </optgroup>
+                        </select>
+                        <input type="number" placeholder="Sets" required inputmode="numeric">
+                        <input type="number" placeholder="Reps" min="1" required inputmode="numeric">
+                        <button type="submit" class="btn-small">Add</button>
+                    </form>
+                </div>
+                
+                <div class="muscle-grid" id="pushMuscles"></div>
+            </div>
+
+            <div class="workout-type" id="leg-section">
+                <h3><span class="emoji">🦵</span> Leg Day - Lower Body</h3>
+                
+                <div class="section-input">
+                    <h4>🦵 Add Leg Exercise</h4>
+                    
+                    <div class="date-picker-section">
+                        <div class="date-toggle" onclick="toggleDatePicker('leg')">
+                            <span id="leg-date-display">📅 Today</span>
+                            <span id="leg-date-arrow">▼</span>
+                        </div>
+                        <div class="date-picker" id="leg-date-picker">
+                            <input type="date" id="leg-date-input" onchange="updateDateDisplay('leg')">
+                            <div class="date-quick-buttons">
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('leg', 0)">Today</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('leg', 1)">Yesterday</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('leg', 2)">2 days ago</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('leg', 3)">3 days ago</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form class="section-form" data-section="leg">
+                        <select required>
+                            <option value="">Select leg exercise...</option>
+                            <optgroup label="Squats & Variants">
+                                <option value="Squat (SQ)">Squat (SQ)</option>
+                                <option value="Front Squat (FSQ)">Front Squat (FSQ)</option>
+                            </optgroup>
+                            <optgroup label="Step-ups">
+                                <option value="Front Step-Up (F Step)">Front Step-Up (F Step)</option>
+                                <option value="Cross-Body Step-Up (CB Step)">Cross-Body Step-Up (CB Step)</option>
+                                <option value="Lateral Step-Up (Lat Step)">Lateral Step-Up (Lat Step)</option>
+                            </optgroup>
+                            <optgroup label="Glute & Bridge">
+                                <option value="Glute Bridge (GB)">Glute Bridge (GB)</option>
+                            </optgroup>
+                            <optgroup label="Lower Leg">
+                                <option value="Calf Raise (CR)">Calf Raise (CR)</option>
+                                <option value="Toe Raise (TR)">Toe Raise (TR)</option>
+                            </optgroup>
+                            <optgroup label="Core/Hip">
+                                <option value="Hanging Leg Raise (HLR)">Hanging Leg Raise (HLR)</option>
+                            </optgroup>
+                        </select>
+                        <input type="number" placeholder="Sets" required inputmode="numeric">
+                        <input type="number" placeholder="Reps" min="1" required inputmode="numeric">
+                        <button type="submit" class="btn-small">Add</button>
+                    </form>
+                </div>
+                
+                <div class="muscle-grid" id="legMuscles"></div>
+            </div>
+
+            <div class="workout-type" id="arms-section">
+                <h3><span class="emoji">💪</span> Arms - Accessory Work</h3>
+                
+                <div class="section-input">
+                    <h4>💪 Add Arms Exercise</h4>
+                    
+                    <div class="date-picker-section">
+                        <div class="date-toggle" onclick="toggleDatePicker('arms')">
+                            <span id="arms-date-display">📅 Today</span>
+                            <span id="arms-date-arrow">▼</span>
+                        </div>
+                        <div class="date-picker" id="arms-date-picker">
+                            <input type="date" id="arms-date-input" onchange="updateDateDisplay('arms')">
+                            <div class="date-quick-buttons">
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('arms', 0)">Today</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('arms', 1)">Yesterday</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('arms', 2)">2 days ago</button>
+                                <button type="button" class="date-quick-btn" onclick="setQuickDate('arms', 3)">3 days ago</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form class="section-form" data-section="arms">
+                        <select required>
+                            <option value="">Select arms exercise...</option>
+                            <optgroup label="Tricep Work">
+                                <option value="Rope Pushdown (Rope PD)">Rope Pushdown (Rope PD)</option>
+                                <option value="Ski Jumps">Ski Jumps</option>
+                                <option value="Bench Press (BP)">Bench Press (BP)</option>
+                                <option value="OHP">OHP</option>
+                                <option value="Dips">Dips</option>
+                            </optgroup>
+                            <optgroup label="Bicep Work">
+                                <option value="Incline Curl (Inc Curl)">Incline Curl (Inc Curl)</option>
+                                <option value="Standing Curl (Std Curl)">Standing Curl (Std Curl)</option>
+                                <option value="Pull-Up/Chin">Pull-Up/Chin</option>
+                                <option value="Single-Arm Row (SA Row)">Single-Arm Row (SA Row)</option>
+                            </optgroup>
+                            <optgroup label="Forearms">
+                                <option value="Reverse Curl (Rev Curl)">Reverse Curl (Rev Curl)</option>
+                                <option value="Chin-Up">Chin-Up</option>
+                            </optgroup>
+                        </select>
+                        <input type="number" placeholder="Sets" required inputmode="numeric">
+                        <input type="number" placeholder="Reps" min="1" required inputmode="numeric">
+                        <button type="submit" class="btn-small">Add</button>
+                    </form>
+                </div>
+                
+                <div class="muscle-grid" id="armMuscles"></div>
+            </div>
+
+            <div class="recent-exercises">
+                <h4>📝 Recent Exercises</h4>
+                <div id="exerciseLog"></div>
+                <button class="btn clear-btn" onclick="clearData()">Clear All Data</button>
+            </div>
+
+            <div class="export-import">
+                <h4>💾 Export / Import Data</h4>
+                
+                <div class="btn-row">
+                    <button class="btn-small btn-export" onclick="exportData()">📤 Export</button>
+                    <button class="btn-small btn-copy" onclick="copyToClipboard()">📋 Copy</button>
+                </div>
+                
+                <textarea id="exportOutput" placeholder="Your workout data will appear here when you export, or paste previous workout data here to import..."></textarea>
+                
+                <div class="btn-row">
+                    <button class="btn-small btn-import" onclick="importData()">📥 Import & Merge</button>
+                </div>
+                
+                <div class="import-note">
+                    💡 Tip: Export your data daily, then import it the next day to continue tracking!
+                </div>
+                
+                <div class="import-note">
+                    ✏️ Correction: Use negative sets (with positive reps) to subtract if you made an error!
+                </div>
+            </div>
+
+            <div class="settings-link">
+                <h4>📱 iPhone Setup Instructions</h4>
+                <div class="settings-note">
+                    <strong>To install as an app on your iPhone:</strong><br>
+                    1. Open this page in Safari<br>
+                    2. Tap the Share button (📤)<br>
+                    3. Scroll down and tap "Add to Home Screen"<br>
+                    4. Tap "Add" - now it works like a native app!
+                </div>
+            </div>
+
+            <div class="settings-link">
+                <h4>⚙️ Settings & Configuration</h4>
+                <div class="settings-note">
+                    Customize your weekly targets, add exercises, and manage your workout configuration.
+                </div>
+                <a href="workout-settings.html" class="btn-settings">⚙️ Open Settings</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====================================================================
+        // EDITABLE CONFIGURATION SECTION
+        // Edit the values below to customize your exercises and targets
+        // ====================================================================
+        
+        // Weekly volume targets per muscle group (sets per week)
+        // Adjust these based on your hypertrophy goals and experimentation
+        const weeklyTargets = {
+            'Erector Spinae': 12,
+            'Rotator Cuff': 8,
+            'Posterior Deltoid': 12,
+            'Rhomboids': 10,
+            'Trapezius': 12,
+            'Latissimus Dorsi': 16,
+            'Biceps Brachii': 14,
+            'Brachialis / Brachioradialis': 10,
+            'Pectoralis Major': 18,
+            'Pectoralis Minor': 8,
+            'Serratus Anterior': 8,
+            'Anterior Deltoid': 12,
+            'Lateral Deltoid': 14,
+            'Triceps Brachii': 16,
+            'Gluteus Maximus': 16,
+            'Gluteus Medius / Minimus': 10,
+            'Quadriceps': 18,
+            'Hamstrings': 12,
+            'Adductors': 8,
+            'Calves': 12,
+            'Hip Flexors': 6,
+            'Tibialis Anterior': 4
+        };
+
+        // Exercise database - Edit this to add/remove exercises
+        // Format: 'Exercise Name': ['Muscle Group 1', 'Muscle Group 2', ...]
+        const exerciseDatabase = {
+            // Pull Day Exercises
+            'Deadlift (DL)': ['Erector Spinae', 'Trapezius', 'Gluteus Maximus', 'Hamstrings'],
+            'RDL': ['Erector Spinae', 'Gluteus Maximus', 'Hamstrings'],
+            'Good Morning (GM)': ['Erector Spinae', 'Hamstrings', 'Gluteus Maximus'],
+            'Front Squat (FSQ)': ['Erector Spinae', 'Quadriceps'],
+            'Barbell Row (BB Row)': ['Erector Spinae', 'Posterior Deltoid', 'Rhomboids', 'Trapezius', 'Latissimus Dorsi'],
+            'Face Pull (FP)': ['Rotator Cuff', 'Posterior Deltoid', 'Rhomboids'],
+            'Single-Arm Row (SA Row)': ['Posterior Deltoid', 'Rhomboids', 'Trapezius', 'Latissimus Dorsi', 'Biceps Brachii'],
+            'Pull-Up/Chin': ['Latissimus Dorsi', 'Biceps Brachii', 'Rhomboids'],
+            'Pullover (PO)': ['Latissimus Dorsi', 'Pectoralis Major', 'Serratus Anterior'],
+            'Incline Curl (Inc Curl)': ['Biceps Brachii'],
+            'Standing Curl (Std Curl)': ['Biceps Brachii'],
+            'Reverse Curl (Rev Curl)': ['Brachialis / Brachioradialis'],
+            'Chin-Up': ['Brachialis / Brachioradialis', 'Latissimus Dorsi', 'Biceps Brachii'],
+            'Shrug': ['Trapezius'],
+            'Back Extension (BE)': ['Erector Spinae', 'Gluteus Maximus'],
+
+            // Push Day Exercises
+            'Bench Press (BP)': ['Pectoralis Major', 'Triceps Brachii', 'Anterior Deltoid'],
+            'Incline Press (Inc)': ['Pectoralis Major', 'Anterior Deltoid', 'Triceps Brachii'],
+            'Dips': ['Pectoralis Major', 'Pectoralis Minor', 'Triceps Brachii'],
+            'Push-Up (PUsh)': ['Pectoralis Major', 'Pectoralis Minor', 'Serratus Anterior', 'Triceps Brachii'],
+            'OHP': ['Anterior Deltoid', 'Lateral Deltoid', 'Triceps Brachii', 'Serratus Anterior'],
+            'Lateral Raise (LatR)': ['Lateral Deltoid'],
+            'Front Raise (FR)': ['Anterior Deltoid'],
+            'Chest Flyes (CF)': ['Pectoralis Major'],
+            'Incline Flye (IF)': ['Pectoralis Major', 'Anterior Deltoid'],
+            'Rope Pushdown (Rope PD)': ['Triceps Brachii'],
+            'Ski Jumps': ['Triceps Brachii'],
+
+            // Leg Day Exercises
+            'Squat (SQ)': ['Gluteus Maximus', 'Quadriceps', 'Adductors', 'Erector Spinae'],
+            'Glute Bridge (GB)': ['Gluteus Maximus', 'Gluteus Medius / Minimus', 'Hamstrings'],
+            'Hip Thrust (HT)': ['Gluteus Maximus', 'Hamstrings'],
+            'Hamstring Curl (HC)': ['Hamstrings'],
+            'Front Step-Up (F Step)': ['Quadriceps', 'Gluteus Maximus'],
+            'Cross-Body Step-Up (CB Step)': ['Gluteus Medius / Minimus', 'Quadriceps', 'Adductors'],
+            'Lateral Step-Up (Lat Step)': ['Gluteus Medius / Minimus', 'Adductors'],
+            'Calf Raise (CR)': ['Calves'],
+            'Hanging Leg Raise (HLR)': ['Hip Flexors'],
+            'Toe Raise (TR)': ['Tibialis Anterior']
+        };
+
+        // Exercise groupings for organized dropdowns
+        const exerciseGroups = {
+            'PULL DAY EXERCISES': {
+                'Deadlifts & Variations': ['Deadlift (DL)', 'RDL', 'Good Morning (GM)', 'Front Squat (FSQ)'],
+                'Rows': ['Barbell Row (BB Row)', 'Single-Arm Row (SA Row)'],
+                'Pull-ups & Chins': ['Pull-Up/Chin', 'Chin-Up'],
+                'Specialized Pulls': ['Face Pull (FP)', 'Pullover (PO)', 'Shrug'],
+                'Back Extensions': ['Back Extension (BE)'],
+                'Bicep Curls': ['Incline Curl (Inc Curl)', 'Standing Curl (Std Curl)', 'Reverse Curl (Rev Curl)']
+            },
+            'PUSH DAY EXERCISES': {
+                'Pressing': ['Bench Press (BP)', 'Incline Press (Inc)', 'OHP'],
+                'Bodyweight Push': ['Dips', 'Push-Up (PUsh)'],
+                'Shoulder Isolation': ['Lateral Raise (LatR)', 'Front Raise (FR)'],
+                'Chest Isolation': ['Chest Flyes (CF)', 'Incline Flye (IF)'],
+                'Tricep Work': ['Rope Pushdown (Rope PD)', 'Ski Jumps']
+            },
+            'LEG DAY EXERCISES': {
+                'Squats & Variants': ['Squat (SQ)', 'Front Squat (FSQ)'],
+                'Step-ups': ['Front Step-Up (F Step)', 'Cross-Body Step-Up (CB Step)', 'Lateral Step-Up (Lat Step)'],
+                'Glute & Hip Work': ['Glute Bridge (GB)', 'Hip Thrust (HT)'],
+                'Hamstring Work': ['Hamstring Curl (HC)', 'RDL', 'Good Morning (GM)'],
+                'Lower Leg': ['Calf Raise (CR)', 'Toe Raise (TR)'],
+                'Core/Hip': ['Hanging Leg Raise (HLR)']
+            }
+        };
+        
+        // ====================================================================
+        // END EDITABLE CONFIGURATION SECTION
+        // ====================================================================
+
+        // Legacy mapping for backward compatibility
+        const exerciseMapping = exerciseDatabase;
+
+        // Muscle group organization
+        const muscleGroups = {
+            pull: ['Erector Spinae', 'Rotator Cuff', 'Posterior Deltoid', 'Rhomboids', 'Trapezius', 'Latissimus Dorsi', 'Biceps Brachii', 'Brachialis / Brachioradialis'],
+            push: ['Pectoralis Major', 'Pectoralis Minor', 'Serratus Anterior', 'Anterior Deltoid', 'Lateral Deltoid', 'Triceps Brachii'],
+            leg: ['Gluteus Maximus', 'Gluteus Medius / Minimus', 'Quadriceps', 'Hamstrings', 'Adductors', 'Calves', 'Hip Flexors', 'Tibialis Anterior'],
+            arms: ['Triceps Brachii', 'Biceps Brachii', 'Brachialis / Brachioradialis']
+        };
+
+        // Initialize data
+        let muscleData = {};
+        let exerciseLog = [];
+        
+        // Planning mode variables
+        let planningMode = false;
+        let originalMuscleData = {};
+        let plannedExercises = [];
+        let plannedMuscleChanges = {};
+
+        // Initialize muscle data
+        function initMuscleData() {
+            Object.values(muscleGroups).flat().forEach(muscle => {
+                if (!muscleData[muscle]) {
+                    muscleData[muscle] = { 
+                        sets: 0, 
+                        reps: 0, 
+                        lastWorked: null,
+                        dailyData: {} // Store data by date: { "2025-09-22": { sets: 3, reps: 30 } }
+                    };
+                }
+                // Ensure dailyData exists for existing muscle data
+                if (!muscleData[muscle].dailyData) {
+                    muscleData[muscle].dailyData = {};
+                }
+            });
+        }
+
+        // Helper functions for date-based calculations
+        function getTodayDateString() {
+            const today = new Date();
+            return today.getFullYear() + '-' + 
+                   String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(today.getDate()).padStart(2, '0');
+        }
+        
+        function getLast7DaysData(muscleData) {
+            const today = new Date();
+            const last7Days = [];
+            
+            // Get last 7 days (including today)
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateString = date.getFullYear() + '-' + 
+                                 String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                                 String(date.getDate()).padStart(2, '0');
+                last7Days.push(dateString);
+            }
+            
+            let totalSets = 0;
+            let totalReps = 0;
+            
+            last7Days.forEach(dateString => {
+                if (muscleData.dailyData && muscleData.dailyData[dateString]) {
+                    totalSets += muscleData.dailyData[dateString].sets || 0;
+                    totalReps += muscleData.dailyData[dateString].reps || 0;
+                }
+            });
+            
+            return { sets: totalSets, reps: totalReps };
+        }
+
+        // Populate exercise dropdown
+        function populateExerciseDropdown() {
+            const select = document.getElementById('exercise');
+            
+            // Clear existing options except the first one
+            select.innerHTML = '<option value="">Select an exercise...</option>';
+            
+            Object.entries(exerciseGroups).forEach(([category, groups]) => {
+                Object.entries(groups).forEach(([groupName, exercises]) => {
+                    // Add group header with category prefix for clarity
+                    const groupHeader = document.createElement('optgroup');
+                    groupHeader.label = `${category} - ${groupName}`;
+                    
+                    exercises.forEach(exercise => {
+                        // Only add exercises that exist in the database
+                        if (exerciseDatabase[exercise]) {
+                            const option = document.createElement('option');
+                            option.value = exercise;
+                            option.textContent = exercise;
+                            groupHeader.appendChild(option);
+                        }
+                    });
+                    
+                    // Only add the group if it has exercises
+                    if (groupHeader.children.length > 0) {
+                        select.appendChild(groupHeader);
+                    }
+                });
+            });
+        }
+
+        // Update muscle displays
+        function updateMuscleDisplays() {
+            updateMuscleGroup('pullMuscles', muscleGroups.pull);
+            updateMuscleGroup('pushMuscles', muscleGroups.push);
+            updateMuscleGroup('legMuscles', muscleGroups.leg);
+            updateMuscleGroup('armMuscles', muscleGroups.arms);
+        }
+
+        function updateMuscleGroup(containerId, muscles) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            muscles.forEach(muscle => {
+                const data = muscleData[muscle] || { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
+                const freshnessText = getFreshnessText(data.lastWorked);
+                
+                // Get today's data
+                const todayString = getTodayDateString();
+                const todayData = (data.dailyData && data.dailyData[todayString]) ? 
+                    data.dailyData[todayString] : { sets: 0, reps: 0 };
+                
+                // Get last 7 days data
+                const last7DaysData = getLast7DaysData(data);
+                
+                // Get weekly target
+                const weeklyTarget = weeklyTargets[muscle] || 12; // Default to 12 if not set
+                const progressPercent = Math.min((last7DaysData.sets / weeklyTarget) * 100, 100);
+                const isOverTarget = last7DaysData.sets > weeklyTarget;
+                
+                const card = document.createElement('div');
+                card.className = 'muscle-card';
+                
+                // Add planning class if this muscle has planned changes
+                const hasPlannedChanges = planningMode && plannedMuscleChanges[muscle];
+                if (hasPlannedChanges) {
+                    card.classList.add('planned');
+                }
+                
+                // Determine progress bar color
+                let progressColor = '#f44336'; // Red for low
+                if (progressPercent >= 100) progressColor = '#4CAF50'; // Green for complete
+                else if (progressPercent >= 75) progressColor = '#FFC107'; // Yellow for close
+                else if (progressPercent >= 50) progressColor = '#FF9800'; // Orange for moderate
+                
+                // Add planning indicator to today's badge if in planning mode
+                let todayBadgeContent = '';
+                if (todayData.sets > 0) {
+                    todayBadgeContent = `<span class="today-badge">+${todayData.sets} today</span>`;
+                    if (hasPlannedChanges) {
+                        const plannedSets = plannedMuscleChanges[muscle]?.sets || 0;
+                        if (plannedSets > 0) {
+                            todayBadgeContent += `<span class="planning-badge">+${plannedSets} planned</span>`;
+                        }
+                    }
+                }
+                
+                card.innerHTML = `
+                    <div class="muscle-name">${muscle}</div>
+                    <div class="muscle-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${Math.min(progressPercent, 100)}%; background-color: ${progressColor};"></div>
+                        </div>
+                        <div class="progress-text">${last7DaysData.sets}/${weeklyTarget} sets ${isOverTarget ? '✅' : ''}</div>
+                    </div>
+                    <div class="muscle-stats">
+                        <span class="reps-count">${last7DaysData.reps} reps (7d)</span>
+                        ${todayBadgeContent}
+                    </div>
+                    <div class="freshness">${freshnessText}</div>
+                `;
+                
+                // Enhanced visual feedback based on target progress
+                if (isOverTarget) {
+                    card.style.borderLeftColor = '#4CAF50';
+                    card.style.borderLeftWidth = '6px';
+                    card.style.backgroundColor = 'rgba(76, 175, 80, 0.05)';
+                } else if (progressPercent >= 75) {
+                    card.style.borderLeftColor = '#FFC107';
+                    card.style.borderLeftWidth = '5px';
+                    card.style.backgroundColor = 'rgba(255, 193, 7, 0.05)';
+                } else if (progressPercent >= 50) {
+                    card.style.borderLeftColor = '#FF9800';
+                    card.style.borderLeftWidth = '4px';
+                } else {
+                    card.style.borderLeftColor = '#F44336';
+                    card.style.borderLeftWidth = '3px';
+                    card.style.backgroundColor = 'rgba(244, 67, 54, 0.05)';
+                }
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // Calculate freshness text
+        function getFreshnessText(lastWorked) {
+            if (!lastWorked) {
+                return '🔲 Never worked';
+            }
+            
+            const now = Date.now();
+            const diffMs = now - lastWorked;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            
+            if (diffDays === 0) {
+                if (diffHours === 0) {
+                    return '🟢 Just worked';
+                } else {
+                    return `🟢 ${diffHours}h ago`;
+                }
+            } else if (diffDays === 1) {
+                return '🟡 Yesterday';
+            } else if (diffDays <= 3) {
+                return `🟠 ${diffDays} days ago`;
+            } else if (diffDays <= 7) {
+                return `🔴 ${diffDays} days ago`;
+            } else {
+                const weeks = Math.floor(diffDays / 7);
+                return `⚫ ${weeks}w ${diffDays % 7}d ago`;
+            }
+        }
+
+        // Update exercise log
+        function updateExerciseLog() {
+            const logContainer = document.getElementById('exerciseLog');
+            logContainer.innerHTML = '';
+            
+            exerciseLog.slice(-5).reverse().forEach(entry => {
+                const logItem = document.createElement('div');
+                logItem.className = 'exercise-log';
+                
+                // Show date if it was a past workout entry
+                const dateInfo = entry.date ? ` (${entry.date})` : '';
+                
+                logItem.innerHTML = `
+                    <span>${entry.exercise}${dateInfo}</span>
+                    <span>${entry.sets} sets × ${entry.reps} reps</span>
+                `;
+                logContainer.appendChild(logItem);
+            });
+        }
+
+        // Handle form submission
+        document.getElementById('exerciseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const exercise = document.getElementById('exercise').value;
+            const sets = parseInt(document.getElementById('sets').value);
+            const reps = parseInt(document.getElementById('reps').value);
+            
+            if (!exercise || sets === 0 || reps <= 0 || isNaN(sets) || isNaN(reps)) return;
+            
+            if (planningMode) {
+                // Planning mode - update displays but don't save to localStorage
+                addExerciseToPlanning(exercise, sets, reps);
+            } else {
+                // Normal mode - update data and save
+                addExerciseNormally(exercise, sets, reps);
+            }
+        });
+
+        function addExerciseToPlanning(exercise, sets, reps) {
+            // Update muscle data temporarily
+            const targetMuscles = exerciseMapping[exercise] || [];
+            const currentTime = Date.now();
+            const todayString = getTodayDateString();
+            
+            targetMuscles.forEach(muscle => {
+                if (!muscleData[muscle]) {
+                    muscleData[muscle] = { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
+                }
+                
+                // Track planned changes
+                if (!plannedMuscleChanges[muscle]) {
+                    plannedMuscleChanges[muscle] = { sets: 0, reps: 0 };
+                }
+                plannedMuscleChanges[muscle].sets += sets;
+                plannedMuscleChanges[muscle].reps += (sets * reps);
+                
+                // Update total counts
+                muscleData[muscle].sets += sets;
+                muscleData[muscle].reps += (sets * reps);
+                
+                // Update daily data
+                if (!muscleData[muscle].dailyData) {
+                    muscleData[muscle].dailyData = {};
+                }
+                if (!muscleData[muscle].dailyData[todayString]) {
+                    muscleData[muscle].dailyData[todayString] = { sets: 0, reps: 0 };
+                }
+                muscleData[muscle].dailyData[todayString].sets += sets;
+                muscleData[muscle].dailyData[todayString].reps += (sets * reps);
+                
+                // Update lastWorked for planning
+                if (sets > 0 && reps > 0) {
+                    muscleData[muscle].lastWorked = currentTime;
+                }
+            });
+            
+            // Add to planned exercises (not real exercise log)
+            plannedExercises.push({
+                exercise,
+                sets,
+                reps,
+                timestamp: new Date().toLocaleTimeString(),
+                isPlanned: true
+            });
+            
+            // Update displays
+            updateMuscleDisplays();
+            
+            // Show planning feedback
+            const exerciseSection = getExerciseSection(exercise);
+            if (exerciseSection) {
+                setTimeout(() => scrollToSection(exerciseSection), 100);
+            }
+            
+            // Reset form
+            document.getElementById('exerciseForm').reset();
+            
+            // Show planning feedback
+            const btn = document.querySelector('.btn');
+            const originalText = btn.textContent;
+            btn.textContent = '📋 Planned!';
+            btn.style.background = '#ff9800';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 1500);
+        }
+
+        function addExerciseNormally(exercise, sets, reps) {
+            // Update muscle data
+            const targetMuscles = exerciseMapping[exercise] || [];
+            const currentTime = Date.now();
+            const todayString = getTodayDateString();
+            
+            targetMuscles.forEach(muscle => {
+                if (!muscleData[muscle]) {
+                    muscleData[muscle] = { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
+                }
+                
+                // Update total counts
+                muscleData[muscle].sets += sets;
+                muscleData[muscle].reps += (sets * reps);
+                
+                // Update daily data
+                if (!muscleData[muscle].dailyData) {
+                    muscleData[muscle].dailyData = {};
+                }
+                if (!muscleData[muscle].dailyData[todayString]) {
+                    muscleData[muscle].dailyData[todayString] = { sets: 0, reps: 0 };
+                }
+                muscleData[muscle].dailyData[todayString].sets += sets;
+                muscleData[muscle].dailyData[todayString].reps += (sets * reps);
+                
+                // Handle lastWorked timestamp based on whether we're adding or subtracting
+                if (sets > 0 && reps > 0) {
+                    // Adding work - update lastWorked
+                    muscleData[muscle].lastWorked = currentTime;
+                } else if (sets < 0 || reps < 0) {
+                    // Subtracting work - check if today's total work becomes zero or negative
+                    const todayData = muscleData[muscle].dailyData[todayString];
+                    if (todayData && (todayData.sets <= 0 || todayData.reps <= 0)) {
+                        // Find the most recent day with actual work
+                        let mostRecentWorkDate = null;
+                        let mostRecentTimestamp = null;
+                        
+                        Object.entries(muscleData[muscle].dailyData).forEach(([date, data]) => {
+                            if (data.sets > 0 && data.reps > 0) {
+                                if (!mostRecentWorkDate || date > mostRecentWorkDate) {
+                                    mostRecentWorkDate = date;
+                                    // Convert date to timestamp for comparison
+                                    const dateObj = new Date(date + 'T23:59:59');
+                                    mostRecentTimestamp = dateObj.getTime();
+                                }
+                            }
+                        });
+                        
+                        muscleData[muscle].lastWorked = mostRecentTimestamp;
+                    }
+                }
+                
+                // Clean up zero or negative daily data
+                if (muscleData[muscle].dailyData[todayString].sets <= 0 && muscleData[muscle].dailyData[todayString].reps <= 0) {
+                    delete muscleData[muscle].dailyData[todayString];
+                }
+            });
+            
+            // Add to exercise log
+            exerciseLog.push({
+                exercise,
+                sets,
+                reps,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            // Update displays
+            updateMuscleDisplays();
+            updateExerciseLog();
+            
+            // Save to localStorage
+            saveData();
+            
+            // Determine which section this exercise belongs to and scroll there
+            const exerciseSection = getExerciseSection(exercise);
+            if (exerciseSection) {
+                setTimeout(() => scrollToSection(exerciseSection), 100);
+            }
+            
+            // Reset form
+            document.getElementById('exerciseForm').reset();
+            
+            // Show success feedback
+            const btn = document.querySelector('.btn');
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Added!';
+            btn.style.background = '#4CAF50';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 1500);
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('workoutMuscleData', JSON.stringify(muscleData));
+            localStorage.setItem('workoutExerciseLog', JSON.stringify(exerciseLog));
+        }
+
+        // Save and restore scroll position
+        function saveActiveSection(sectionId) {
+            localStorage.setItem('workoutActiveSection', sectionId);
+            updateActiveNavButton(sectionId);
+        }
+
+        function restoreActiveSection() {
+            const savedSection = localStorage.getItem('workoutActiveSection');
+            if (savedSection) {
+                setTimeout(() => {
+                    scrollToSection(savedSection, false);
+                }, 500); // Small delay to ensure page is fully loaded
+            }
+        }
+
+        function scrollToSection(sectionId, save = true) {
+            const element = document.getElementById(sectionId + '-section');
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Highlight active section
+                document.querySelectorAll('.workout-type').forEach(section => {
+                    section.classList.remove('active-section');
+                });
+                element.classList.add('active-section');
+                
+                if (save) {
+                    saveActiveSection(sectionId);
+                }
+                updateActiveNavButton(sectionId);
+            }
+        }
+
+        function updateActiveNavButton(sectionId) {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const buttons = document.querySelectorAll('.nav-btn');
+            const sectionMap = { 'pull': 0, 'push': 1, 'leg': 2, 'arms': 3 };
+            if (buttons[sectionMap[sectionId]]) {
+                buttons[sectionMap[sectionId]].classList.add('active');
+            }
+        }
+
+        // Determine which section an exercise belongs to
+        function getExerciseSection(exercise) {
+            const pullExercises = ['Deadlift (DL)', 'RDL', 'Good Morning (GM)', 'Front Squat (FSQ)', 'Barbell Row (BB Row)', 'Face Pull (FP)', 'Single-Arm Row (SA Row)', 'Pull-Up/Chin', 'Pullover (PO)', 'Incline Curl (Inc Curl)', 'Standing Curl (Std Curl)', 'Reverse Curl (Rev Curl)', 'Chin-Up', 'Shrug'];
+            const pushExercises = ['Bench Press (BP)', 'Incline Press (Inc)', 'Dips', 'Push-Up (PUsh)', 'OHP', 'Lateral Raise (LatR)', 'Rope Pushdown (Rope PD)', 'Ski Jumps'];
+            const legExercises = ['Squat (SQ)', 'Glute Bridge (GB)', 'Front Step-Up (F Step)', 'Cross-Body Step-Up (CB Step)', 'Lateral Step-Up (Lat Step)', 'Calf Raise (CR)', 'Hanging Leg Raise (HLR)', 'Toe Raise (TR)'];
+            
+            if (pullExercises.includes(exercise)) return 'pull';
+            if (pushExercises.includes(exercise)) return 'push';
+            if (legExercises.includes(exercise)) return 'leg';
+            return 'arms'; // Default for remaining exercises
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            const savedMuscleData = localStorage.getItem('workoutMuscleData');
+            const savedExerciseLog = localStorage.getItem('workoutExerciseLog');
+            
+            if (savedMuscleData) {
+                muscleData = JSON.parse(savedMuscleData);
+            }
+            
+            if (savedExerciseLog) {
+                exerciseLog = JSON.parse(savedExerciseLog);
+            }
+        }
+
+        // Clear all data with mobile-friendly confirmation
+        function clearData() {
+            showConfirmModal(
+                '🗑️ Clear All Data',
+                'Are you sure you want to clear all workout data? This cannot be undone.',
+                function() {
+                    muscleData = {};
+                    exerciseLog = [];
+                    initMuscleData();
+                    updateMuscleDisplays();
+                    updateExerciseLog();
+                    saveData();
+                    
+                    // Show success feedback
+                    showPlanningFeedback('✅ All data cleared successfully', '#4CAF50');
+                }
+            );
+        }
+
+        // Mobile-friendly confirmation modal
+        let confirmCallback = null;
+
+        function showConfirmModal(title, message, callback) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            confirmCallback = callback;
+            document.getElementById('confirmModal').classList.add('visible');
+        }
+
+        function hideConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('visible');
+            confirmCallback = null;
+        }
+
+        function confirmAction() {
+            if (confirmCallback) {
+                confirmCallback();
+            }
+            hideConfirmModal();
+        }
+
+        // Export data to text format
+        function exportData() {
+            const timestamp = new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            let exportText = `WORKOUT DATA EXPORT - ${timestamp}\n`;
+            exportText += `=====================================\n\n`;
+            
+            // Export muscle group data
+            exportText += `MUSCLE GROUP PROGRESS:\n`;
+            exportText += `----------------------\n`;
+            
+            const categories = {
+                'PULL DAY - Back & Biceps': muscleGroups.pull,
+                'PUSH DAY - Chest, Shoulders & Triceps': muscleGroups.push,
+                'LEG DAY - Lower Body': muscleGroups.leg,
+                'ARMS - Accessory Work': muscleGroups.arms
+            };
+            
+            Object.entries(categories).forEach(([category, muscles]) => {
+                exportText += `\n${category}:\n`;
+                muscles.forEach(muscle => {
+                    const data = muscleData[muscle] || { sets: 0, reps: 0 };
+                    if (data.sets > 0 || data.reps > 0) {
+                        exportText += `  ${muscle}: ${data.sets} sets, ${data.reps} reps\n`;
+                    }
+                });
+            });
+            
+            // Export recent exercises
+            if (exerciseLog.length > 0) {
+                exportText += `\n\nRECENT EXERCISES:\n`;
+                exportText += `----------------\n`;
+                exerciseLog.forEach(entry => {
+                    exportText += `${entry.exercise}: ${entry.sets} sets × ${entry.reps} reps (${entry.timestamp})\n`;
+                });
+            }
+            
+            // Add raw data for import
+            exportText += `\n\n[RAW_DATA_START]\n`;
+            exportText += JSON.stringify({ muscleData, exerciseLog }, null, 2);
+            exportText += `\n[RAW_DATA_END]`;
+            
+            document.getElementById('exportOutput').value = exportText;
+            
+            // Show success feedback
+            const btn = document.querySelector('.btn-export');
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Exported!';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 2000);
+        }
+        
+        // Copy export data to clipboard
+        async function copyToClipboard() {
+            const textarea = document.getElementById('exportOutput');
+            if (!textarea.value.trim()) {
+                alert('Please export data first!');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(textarea.value);
+                const btn = document.querySelector('.btn-copy');
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            } catch (err) {
+                // Fallback for older browsers
+                textarea.select();
+                document.execCommand('copy');
+                alert('Data copied to clipboard!');
+            }
+        }
+        
+        // Import and merge data
+        function importData() {
+            const importText = document.getElementById('exportOutput').value.trim();
+            if (!importText) {
+                alert('Please paste workout data to import!');
+                return;
+            }
+            
+            try {
+                // Try to extract raw data from export format
+                const rawDataMatch = importText.match(/\[RAW_DATA_START\]([\s\S]*?)\[RAW_DATA_END\]/);
+                
+                if (rawDataMatch) {
+                    const rawData = JSON.parse(rawDataMatch[1].trim());
+                    
+                    if (rawData.muscleData) {
+                        // Merge muscle data (add to existing)
+                        Object.entries(rawData.muscleData).forEach(([muscle, data]) => {
+                            if (!muscleData[muscle]) {
+                                muscleData[muscle] = { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
+                            }
+                            
+                            // Ensure dailyData exists
+                            if (!muscleData[muscle].dailyData) {
+                                muscleData[muscle].dailyData = {};
+                            }
+                            
+                            muscleData[muscle].sets += data.sets || 0;
+                            muscleData[muscle].reps += data.reps || 0;
+                            
+                            // Keep the most recent timestamp
+                            if (data.lastWorked) {
+                                if (!muscleData[muscle].lastWorked || data.lastWorked > muscleData[muscle].lastWorked) {
+                                    muscleData[muscle].lastWorked = data.lastWorked;
+                                }
+                            }
+                            
+                            // Merge daily data
+                            if (data.dailyData) {
+                                Object.entries(data.dailyData).forEach(([date, dayData]) => {
+                                    if (!muscleData[muscle].dailyData[date]) {
+                                        muscleData[muscle].dailyData[date] = { sets: 0, reps: 0 };
+                                    }
+                                    muscleData[muscle].dailyData[date].sets += dayData.sets || 0;
+                                    muscleData[muscle].dailyData[date].reps += dayData.reps || 0;
+                                });
+                            }
+                        });
+                    }
+                    
+                    if (rawData.exerciseLog && Array.isArray(rawData.exerciseLog)) {
+                        // Add imported exercises to log (keep recent ones)
+                        exerciseLog = [...exerciseLog, ...rawData.exerciseLog];
+                        // Keep only last 20 entries to prevent bloat
+                        if (exerciseLog.length > 20) {
+                            exerciseLog = exerciseLog.slice(-20);
+                        }
+                    }
+                    
+                    // Update displays and save
+                    updateMuscleDisplays();
+                    updateExerciseLog();
+                    saveData();
+                    
+                    // Clear import area and show success
+                    document.getElementById('exportOutput').value = '';
+                    
+                    const btn = document.querySelector('.btn-import');
+                    const originalText = btn.textContent;
+                    btn.textContent = '✅ Imported!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 2000);
+                    
+                    alert('Workout data imported and merged successfully!');
+                } else {
+                    throw new Error('Invalid data format');
+                }
+            } catch (error) {
+                alert('Error importing data. Please make sure you\'re pasting valid workout export data.');
+                console.error('Import error:', error);
+            }
+        }
+
+        // Handle section-specific form submissions
+        function setupSectionForms() {
+            document.querySelectorAll('.section-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const select = this.querySelector('select');
+                    const setsInput = this.querySelector('input[placeholder="Sets"]');
+                    const repsInput = this.querySelector('input[placeholder="Reps"]');
+                    
+                    const exercise = select.value;
+                    const sets = parseInt(setsInput.value);
+                    const reps = parseInt(repsInput.value);
+                    
+                    if (!exercise || sets === 0 || reps <= 0 || isNaN(sets) || isNaN(reps)) return;
+                    
+                    // Get the selected date for this section
+                    const sectionId = this.dataset.section;
+                    const selectedDate = getSelectedDate(sectionId);
+                    
+                    // Update muscle data
+                    const targetMuscles = exerciseMapping[exercise] || [];
+                    const currentTime = Date.now();
+                    
+                    targetMuscles.forEach(muscle => {
+                        if (!muscleData[muscle]) {
+                            muscleData[muscle] = { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
+                        }
+                        
+                        // Update total counts
+                        muscleData[muscle].sets += sets;
+                        muscleData[muscle].reps += (sets * reps);
+                        
+                        // Update daily data for the selected date
+                        if (!muscleData[muscle].dailyData) {
+                            muscleData[muscle].dailyData = {};
+                        }
+                        if (!muscleData[muscle].dailyData[selectedDate]) {
+                            muscleData[muscle].dailyData[selectedDate] = { sets: 0, reps: 0 };
+                        }
+                        muscleData[muscle].dailyData[selectedDate].sets += sets;
+                        muscleData[muscle].dailyData[selectedDate].reps += (sets * reps);
+                        
+                        // Handle lastWorked timestamp based on whether we're adding or subtracting
+                        if (sets > 0 && reps > 0) {
+                            // Adding work - update lastWorked only if this date is more recent
+                            if (!muscleData[muscle].lastWorked || selectedDate >= getTodayDateString()) {
+                                muscleData[muscle].lastWorked = currentTime;
+                            }
+                        } else if (sets < 0 || reps < 0) {
+                            // Subtracting work - check if today's total work becomes zero or negative
+                            const todayData = muscleData[muscle].dailyData[getTodayDateString()];
+                            if (selectedDate === getTodayDateString() && todayData && (todayData.sets <= 0 || todayData.reps <= 0)) {
+                                // Find the most recent day with actual work
+                                let mostRecentWorkDate = null;
+                                let mostRecentTimestamp = null;
+                                
+                                Object.entries(muscleData[muscle].dailyData).forEach(([date, data]) => {
+                                    if (data.sets > 0 && data.reps > 0) {
+                                        if (!mostRecentWorkDate || date > mostRecentWorkDate) {
+                                            mostRecentWorkDate = date;
+                                            // Convert date to timestamp for comparison
+                                            const dateObj = new Date(date + 'T23:59:59');
+                                            mostRecentTimestamp = dateObj.getTime();
+                                        }
+                                    }
+                                });
+                                
+                                muscleData[muscle].lastWorked = mostRecentTimestamp;
+                            }
+                        }
+                        
+                        // Clean up zero or negative daily data
+                        if (muscleData[muscle].dailyData[selectedDate].sets <= 0 && muscleData[muscle].dailyData[selectedDate].reps <= 0) {
+                            delete muscleData[muscle].dailyData[selectedDate];
+                        }
+                    });
+                    
+                    // Add to exercise log with date info
+                    const isToday = selectedDate === getTodayDateString();
+                    const logEntry = {
+                        exercise,
+                        sets,
+                        reps,
+                        timestamp: new Date().toLocaleTimeString()
+                    };
+                    
+                    // Add date info if not today
+                    if (!isToday) {
+                        logEntry.date = formatDateForDisplay(selectedDate);
+                    }
+                    
+                    exerciseLog.push(logEntry);
+                    
+                    // Update displays
+                    updateMuscleDisplays();
+                    updateExerciseLog();
+                    
+                    // Save to localStorage
+                    saveData();
+                    
+                    // Stay in current section
+                    if (sectionId) {
+                        saveActiveSection(sectionId);
+                    }
+                    
+                    // Reset form
+                    this.reset();
+                    
+                    // Show success feedback with date context
+                    const btn = this.querySelector('.btn-small');
+                    const originalText = btn.textContent;
+                    const dateContext = isToday ? '' : ` (${formatDateForDisplay(selectedDate)})`;
+                    btn.textContent = `✅ Added${dateContext}!`;
+                    btn.style.background = '#4CAF50';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '';
+                    }, 2000);
+                });
+            });
+        }
+
+        // Date picker functionality
+        function getSelectedDate(section) {
+            const dateInput = document.getElementById(`${section}-date-input`);
+            return dateInput.value || getTodayDateString();
+        }
+
+        function formatDateForDisplay(dateString) {
+            const date = new Date(dateString + 'T00:00:00');
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        function toggleDatePicker(section) {
+            const picker = document.getElementById(`${section}-date-picker`);
+            const toggle = document.querySelector(`#${section}-date-display`).parentElement;
+            const arrow = document.getElementById(`${section}-date-arrow`);
+            
+            const isExpanded = picker.classList.contains('expanded');
+            
+            if (isExpanded) {
+                picker.classList.remove('expanded');
+                toggle.classList.remove('expanded');
+                arrow.textContent = '▼';
+            } else {
+                picker.classList.add('expanded');
+                toggle.classList.add('expanded');
+                arrow.textContent = '▲';
+                
+                // Set input to current date if not set
+                const dateInput = document.getElementById(`${section}-date-input`);
+                if (!dateInput.value) {
+                    dateInput.value = getTodayDateString();
+                }
+            }
+        }
+
+        function updateDateDisplay(section) {
+            const dateInput = document.getElementById(`${section}-date-input`);
+            const display = document.getElementById(`${section}-date-display`);
+            const today = getTodayDateString();
+            
+            if (dateInput.value === today || !dateInput.value) {
+                display.innerHTML = '📅 Today <span class="today-badge">TODAY</span>';
+            } else {
+                const formattedDate = formatDateForDisplay(dateInput.value);
+                display.innerHTML = `📅 ${formattedDate}`;
+            }
+            
+            // Update active state of quick buttons
+            updateQuickButtonStates(section);
+        }
+
+        function setQuickDate(section, daysAgo) {
+            const date = new Date();
+            date.setDate(date.getDate() - daysAgo);
+            
+            const dateInput = document.getElementById(`${section}-date-input`);
+            dateInput.value = date.toISOString().split('T')[0];
+            
+            updateDateDisplay(section);
+        }
+
+        function updateQuickButtonStates(section) {
+            const selectedDate = document.getElementById(`${section}-date-input`).value;
+            const buttons = document.querySelectorAll(`#${section}-date-picker .date-quick-btn`);
+            
+            buttons.forEach((btn, index) => {
+                const targetDate = new Date();
+                targetDate.setDate(targetDate.getDate() - index);
+                const targetDateStr = targetDate.toISOString().split('T')[0];
+                
+                if (selectedDate === targetDateStr) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize date pickers on page load
+        function initializeDatePickers() {
+            const sections = ['pull', 'push', 'leg', 'arms'];
+            const today = getTodayDateString();
+            
+            sections.forEach(section => {
+                const dateInput = document.getElementById(`${section}-date-input`);
+                dateInput.value = today;
+                updateDateDisplay(section);
+            });
+        }
+
+        // Load targets from localStorage or settings page
+        function loadTargets() {
+            const savedTargets = localStorage.getItem('workoutTargets');
+            if (savedTargets) {
+                const targets = JSON.parse(savedTargets);
+                // Merge saved targets with defaults (in case new muscles were added)
+                Object.assign(weeklyTargets, targets);
+            }
+            
+            // Load exercise database from localStorage (set by settings page)
+            const savedExercises = localStorage.getItem('workoutExerciseDatabase');
+            if (savedExercises) {
+                Object.assign(exerciseDatabase, JSON.parse(savedExercises));
+            }
+        }
+
+        // Planning Mode Functions
+        function togglePlanningMode() {
+            planningMode = !planningMode;
+            const indicator = document.getElementById('planningModeIndicator');
+            const toggle = document.getElementById('planningToggle');
+            const planningBar = document.getElementById('planningBar');
+            
+            if (planningMode) {
+                // Enter planning mode
+                originalMuscleData = JSON.parse(JSON.stringify(muscleData)); // Deep clone
+                plannedExercises = [];
+                plannedMuscleChanges = {};
+                
+                indicator.style.display = 'block';
+                toggle.textContent = '📋 Exit Planning Mode';
+                toggle.style.background = 'linear-gradient(45deg, #f44336, #d32f2f)';
+                
+                // Set up scroll detection for planning bar
+                window.addEventListener('scroll', handlePlanningScroll);
+                
+            } else {
+                // Exit planning mode - revert if not committed
+                revertPlannedWorkout();
+                
+                indicator.style.display = 'none';
+                toggle.textContent = '📋 Enter Planning Mode';
+                toggle.style.background = 'linear-gradient(45deg, #ff9800, #ff5722)';
+                
+                // Remove scroll detection and hide planning bar
+                window.removeEventListener('scroll', handlePlanningScroll);
+                planningBar.classList.remove('visible');
+            }
+        }
+
+        function handlePlanningScroll() {
+            const planningBar = document.getElementById('planningBar');
+            const planningIndicator = document.getElementById('planningModeIndicator');
+            const scrollY = window.scrollY;
+            
+            // Show floating bar when scrolled past the planning indicator
+            if (planningIndicator && scrollY > planningIndicator.offsetTop + planningIndicator.offsetHeight) {
+                planningBar.classList.add('visible');
+            } else {
+                planningBar.classList.remove('visible');
+            }
+        }
+
+        function commitPlannedWorkout() {
+            if (!planningMode) return;
+            
+            // Keep the current muscleData (which includes planned changes)
+            // Add planned exercises to the actual exercise log
+            exerciseLog = [...exerciseLog, ...plannedExercises];
+            
+            // Keep only last 20 entries to prevent bloat
+            if (exerciseLog.length > 20) {
+                exerciseLog = exerciseLog.slice(-20);
+            }
+            
+            // Save to localStorage
+            saveData();
+            
+            // Reset planning state
+            originalMuscleData = {};
+            plannedExercises = [];
+            plannedMuscleChanges = {};
+            
+            // Exit planning mode
+            togglePlanningMode();
+            
+            // Show success message
+            showPlanningFeedback('✅ Workout committed successfully!', '#4CAF50');
+        }
+
+        function revertPlannedWorkout() {
+            if (!planningMode) return;
+            
+            // Restore original muscle data
+            if (Object.keys(originalMuscleData).length > 0) {
+                muscleData = JSON.parse(JSON.stringify(originalMuscleData));
+            }
+            
+            // Clear planned state
+            plannedExercises = [];
+            plannedMuscleChanges = {};
+            
+            // Update displays
+            updateMuscleDisplays();
+            updateExerciseLog();
+            
+            // Show revert message if we were in planning mode
+            if (planningMode) {
+                showPlanningFeedback('❌ Planning reverted - back to original state', '#f44336');
+            }
+            
+            // Hide planning bar
+            const planningBar = document.getElementById('planningBar');
+            planningBar.classList.remove('visible');
+        }
+
+        function showPlanningFeedback(message, color) {
+            const feedback = document.createElement('div');
+            feedback.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${color};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-weight: bold;
+                z-index: 1000;
+                animation: slideDown 0.3s ease;
+            `;
+            feedback.textContent = message;
+            
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                feedback.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => feedback.remove(), 300);
+            }, 3000);
+        }
+
+        // iPhone-specific optimizations
+        function initMobileOptimizations() {
+            // Prevent iOS bounce scrolling on the body
+            document.body.addEventListener('touchmove', function(e) {
+                if (e.target === document.body) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            // Improve touch responsiveness
+            const style = document.createElement('style');
+            style.textContent = `
+                * {
+                    -webkit-tap-highlight-color: rgba(79, 172, 254, 0.2);
+                    -webkit-touch-callout: none;
+                }
+                
+                input, select, textarea {
+                    -webkit-appearance: none;
+                    border-radius: 8px;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Add haptic feedback for iOS if available
+            window.addHapticFeedback = function() {
+                if (window.navigator && window.navigator.vibrate) {
+                    window.navigator.vibrate(50); // Short vibration
+                }
+            };
+
+            // Show installation prompt for iPhone users
+            if (window.navigator.standalone === false) {
+                // Not running as installed app, show helpful hint
+                setTimeout(() => {
+                    const installHint = document.createElement('div');
+                    installHint.style.cssText = `
+                        position: fixed;
+                        top: 10px;
+                        left: 10px;
+                        right: 10px;
+                        background: linear-gradient(45deg, #4CAF50, #45a049);
+                        color: white;
+                        padding: 12px 16px;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        text-align: center;
+                        z-index: 10000;
+                        animation: slideDown 0.3s ease;
+                        cursor: pointer;
+                    `;
+                    installHint.innerHTML = `
+                        📱 <strong>Install as App:</strong> Tap Share (📤) → Add to Home Screen for the best experience!
+                        <div style="font-size: 12px; margin-top: 5px; opacity: 0.9;">Tap to dismiss</div>
+                    `;
+                    
+                    installHint.onclick = () => installHint.remove();
+                    document.body.appendChild(installHint);
+                    
+                    // Auto-dismiss after 8 seconds
+                    setTimeout(() => {
+                        if (installHint.parentNode) {
+                            installHint.style.animation = 'slideUp 0.3s ease';
+                            setTimeout(() => installHint.remove(), 300);
+                        }
+                    }, 8000);
+                }, 2000); // Show after 2 seconds
+            }
+
+            // Enhanced form submissions with haptic feedback
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', () => {
+                    if (window.addHapticFeedback) window.addHapticFeedback();
+                });
+            });
+
+            // Add haptic feedback to buttons
+            document.querySelectorAll('.btn, .btn-small, .nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (window.addHapticFeedback) window.addHapticFeedback();
+                });
+            });
+        }
+
+        // Initialize app
+        function init() {
+            loadData();
+            loadTargets(); // Load custom targets and exercises from localStorage
+            initMuscleData();
+            populateExerciseDropdown();
+            updateMuscleDisplays();
+            updateExerciseLog();
+            setupSectionForms(); // Setup section-specific form handlers
+            initializeDatePickers(); // Initialize date picker functionality
+            restoreActiveSection(); // Restore last viewed section
+            initMobileOptimizations(); // iPhone-specific optimizations
+        }
+
+        // Start the app when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
