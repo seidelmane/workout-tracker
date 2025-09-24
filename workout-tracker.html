@@ -566,6 +566,117 @@
             font-weight: bold;
         }
 
+        .muscle-card {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .muscle-card::after {
+            content: '👆 Tap for exercises';
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 8px;
+            color: #999;
+            opacity: 0.7;
+        }
+
+        .muscle-card:hover::after {
+            opacity: 1;
+            color: #4facfe;
+        }
+
+        /* Exercise popup modal */
+        .exercise-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .exercise-modal.visible {
+            display: flex;
+        }
+
+        .exercise-modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .exercise-modal-header {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+        }
+
+        .exercise-modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .exercise-modal-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .exercise-modal-body {
+            padding: 20px;
+        }
+
+        .exercise-list {
+            list-style: none;
+        }
+
+        .exercise-list-item {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4facfe;
+            transition: all 0.2s;
+        }
+
+        .exercise-list-item:hover {
+            background: #e3f2fd;
+            transform: translateX(4px);
+        }
+
+        .exercise-list-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .close-modal {
+            background: #e0e0e0;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.2s;
+        }
+
+        .close-modal:hover {
+            background: #d0d0d0;
+            transform: translateY(-2px);
+        }
+
         .planning-badge {
             background: #ff9800;
             color: white;
@@ -1038,6 +1149,20 @@
         </div>
     </div>
 
+    <!-- Exercise List Modal -->
+    <div class="exercise-modal" id="exerciseModal">
+        <div class="exercise-modal-content">
+            <div class="exercise-modal-header">
+                <div class="exercise-modal-title" id="exerciseModalTitle">Muscle Group</div>
+                <div class="exercise-modal-subtitle">Exercises that target this muscle</div>
+            </div>
+            <div class="exercise-modal-body">
+                <ul class="exercise-list" id="exerciseModalList"></ul>
+                <button class="close-modal" onclick="hideExerciseModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Planning Bar -->
     <div class="planning-bar" id="planningBar">
         <div class="planning-bar-content">
@@ -1140,19 +1265,31 @@
                                 <option value="Barbell Row (BB Row)">Barbell Row (BB Row)</option>
                                 <option value="Single-Arm Row (SA Row)">Single-Arm Row (SA Row)</option>
                             </optgroup>
-                            <optgroup label="Pull-ups & Chins">
+                            <optgroup label="Pull-ups & Pulldowns">
                                 <option value="Pull-Up/Chin">Pull-Up/Chin</option>
                                 <option value="Chin-Up">Chin-Up</option>
+                                <option value="Close Grip Lat Pulldown">Close Grip Lat Pulldown</option>
+                                <option value="Wide Lat Pulldown">Wide Lat Pulldown</option>
                             </optgroup>
                             <optgroup label="Specialized Pulls">
                                 <option value="Face Pull (FP)">Face Pull (FP)</option>
                                 <option value="Pullover (PO)">Pullover (PO)</option>
                                 <option value="Shrug">Shrug</option>
                             </optgroup>
-                            <optgroup label="Bicep Curls">
-                                <option value="Incline Curl (Inc Curl)">Incline Curl (Inc Curl)</option>
-                                <option value="Standing Curl (Std Curl)">Standing Curl (Std Curl)</option>
-                                <option value="Reverse Curl (Rev Curl)">Reverse Curl (Rev Curl)</option>
+                            <optgroup label="Incline Curls">
+                                <option value="Incline Hammer Curl">Incline Hammer Curl</option>
+                                <option value="Incline Straight Curl">Incline Straight Curl</option>
+                                <option value="Incline Reverse Curl">Incline Reverse Curl</option>
+                            </optgroup>
+                            <optgroup label="Standing Curls">
+                                <option value="Standing Hammer Curl">Standing Hammer Curl</option>
+                                <option value="Standing Straight Curl">Standing Straight Curl</option>
+                                <option value="Standing Reverse Curl">Standing Reverse Curl</option>
+                            </optgroup>
+                            <optgroup label="Preacher Curls">
+                                <option value="Preacher Hammer Curl">Preacher Hammer Curl</option>
+                                <option value="Preacher Straight Curl">Preacher Straight Curl</option>
+                                <option value="Preacher Reverse Curl">Preacher Reverse Curl</option>
                             </optgroup>
                         </select>
                         <input type="number" placeholder="Sets" required inputmode="numeric">
@@ -1189,9 +1326,13 @@
                     <form class="section-form" data-section="push">
                         <select required>
                             <option value="">Select push exercise...</option>
-                            <optgroup label="Pressing">
+                            <optgroup label="Bench Pressing">
                                 <option value="Bench Press (BP)">Bench Press (BP)</option>
+                                <option value="Close Grip Bench Press">Close Grip Bench Press</option>
                                 <option value="Incline Press (Inc)">Incline Press (Inc)</option>
+                                <option value="Close Grip Incline Bench">Close Grip Incline Bench</option>
+                            </optgroup>
+                            <optgroup label="Overhead Pressing">
                                 <option value="OHP">OHP</option>
                             </optgroup>
                             <optgroup label="Bodyweight Push">
@@ -1200,6 +1341,11 @@
                             </optgroup>
                             <optgroup label="Shoulder Isolation">
                                 <option value="Lateral Raise (LatR)">Lateral Raise (LatR)</option>
+                                <option value="Front Raise (FR)">Front Raise (FR)</option>
+                            </optgroup>
+                            <optgroup label="Chest Isolation">
+                                <option value="Chest Flyes (CF)">Chest Flyes (CF)</option>
+                                <option value="Incline Flye (IF)">Incline Flye (IF)</option>
                             </optgroup>
                             <optgroup label="Tricep Work">
                                 <option value="Rope Pushdown (Rope PD)">Rope Pushdown (Rope PD)</option>
@@ -1416,7 +1562,26 @@
             'Face Pull (FP)': ['Rotator Cuff', 'Posterior Deltoid', 'Rhomboids'],
             'Single-Arm Row (SA Row)': ['Posterior Deltoid', 'Rhomboids', 'Trapezius', 'Latissimus Dorsi', 'Biceps Brachii'],
             'Pull-Up/Chin': ['Latissimus Dorsi', 'Biceps Brachii', 'Rhomboids'],
+            'Close Grip Lat Pulldown': ['Latissimus Dorsi', 'Rhomboids', 'Biceps Brachii'],
+            'Wide Lat Pulldown': ['Latissimus Dorsi', 'Posterior Deltoid', 'Rhomboids'],
             'Pullover (PO)': ['Latissimus Dorsi', 'Pectoralis Major', 'Serratus Anterior'],
+            
+            // Curl Variations - Incline
+            'Incline Hammer Curl': ['Biceps Brachii', 'Brachialis / Brachioradialis'],
+            'Incline Straight Curl': ['Biceps Brachii'],
+            'Incline Reverse Curl': ['Brachialis / Brachioradialis'],
+            
+            // Curl Variations - Standing
+            'Standing Hammer Curl': ['Biceps Brachii', 'Brachialis / Brachioradialis'],
+            'Standing Straight Curl': ['Biceps Brachii'],
+            'Standing Reverse Curl': ['Brachialis / Brachioradialis'],
+            
+            // Curl Variations - Preacher
+            'Preacher Hammer Curl': ['Biceps Brachii', 'Brachialis / Brachioradialis'],
+            'Preacher Straight Curl': ['Biceps Brachii'],
+            'Preacher Reverse Curl': ['Brachialis / Brachioradialis'],
+            
+            // Legacy curl names for compatibility
             'Incline Curl (Inc Curl)': ['Biceps Brachii'],
             'Standing Curl (Std Curl)': ['Biceps Brachii'],
             'Reverse Curl (Rev Curl)': ['Brachialis / Brachioradialis'],
@@ -1426,7 +1591,9 @@
 
             // Push Day Exercises
             'Bench Press (BP)': ['Pectoralis Major', 'Triceps Brachii', 'Anterior Deltoid'],
+            'Close Grip Bench Press': ['Triceps Brachii', 'Pectoralis Major', 'Anterior Deltoid'],
             'Incline Press (Inc)': ['Pectoralis Major', 'Anterior Deltoid', 'Triceps Brachii'],
+            'Close Grip Incline Bench': ['Triceps Brachii', 'Pectoralis Major', 'Anterior Deltoid'],
             'Dips': ['Pectoralis Major', 'Pectoralis Minor', 'Triceps Brachii'],
             'Push-Up (PUsh)': ['Pectoralis Major', 'Pectoralis Minor', 'Serratus Anterior', 'Triceps Brachii'],
             'OHP': ['Anterior Deltoid', 'Lateral Deltoid', 'Triceps Brachii', 'Serratus Anterior'],
@@ -1455,13 +1622,16 @@
             'PULL DAY EXERCISES': {
                 'Deadlifts & Variations': ['Deadlift (DL)', 'RDL', 'Good Morning (GM)', 'Front Squat (FSQ)'],
                 'Rows': ['Barbell Row (BB Row)', 'Single-Arm Row (SA Row)'],
-                'Pull-ups & Chins': ['Pull-Up/Chin', 'Chin-Up'],
+                'Pull-ups & Pulldowns': ['Pull-Up/Chin', 'Chin-Up', 'Close Grip Lat Pulldown', 'Wide Lat Pulldown'],
                 'Specialized Pulls': ['Face Pull (FP)', 'Pullover (PO)', 'Shrug'],
                 'Back Extensions': ['Back Extension (BE)'],
-                'Bicep Curls': ['Incline Curl (Inc Curl)', 'Standing Curl (Std Curl)', 'Reverse Curl (Rev Curl)']
+                'Incline Curls': ['Incline Hammer Curl', 'Incline Straight Curl', 'Incline Reverse Curl'],
+                'Standing Curls': ['Standing Hammer Curl', 'Standing Straight Curl', 'Standing Reverse Curl'],
+                'Preacher Curls': ['Preacher Hammer Curl', 'Preacher Straight Curl', 'Preacher Reverse Curl']
             },
             'PUSH DAY EXERCISES': {
-                'Pressing': ['Bench Press (BP)', 'Incline Press (Inc)', 'OHP'],
+                'Bench Pressing': ['Bench Press (BP)', 'Close Grip Bench Press', 'Incline Press (Inc)', 'Close Grip Incline Bench'],
+                'Overhead Pressing': ['OHP'],
                 'Bodyweight Push': ['Dips', 'Push-Up (PUsh)'],
                 'Shoulder Isolation': ['Lateral Raise (LatR)', 'Front Raise (FR)'],
                 'Chest Isolation': ['Chest Flyes (CF)', 'Incline Flye (IF)'],
@@ -1617,6 +1787,9 @@
                 
                 const card = document.createElement('div');
                 card.className = 'muscle-card';
+                
+                // Add click handler to show exercises
+                card.addEventListener('click', () => showExercisesForMuscle(muscle));
                 
                 // Add planning class if this muscle has planned changes
                 const hasPlannedChanges = planningMode && plannedMuscleChanges[muscle];
@@ -2027,6 +2200,75 @@
             }
             hideConfirmModal();
         }
+
+        // Exercise Modal Functions
+        function showExercisesForMuscle(muscleName) {
+            // Find all exercises that target this muscle
+            const exercisesForMuscle = [];
+            Object.entries(exerciseDatabase).forEach(([exercise, muscles]) => {
+                if (muscles.includes(muscleName)) {
+                    exercisesForMuscle.push(exercise);
+                }
+            });
+
+            // Sort exercises alphabetically
+            exercisesForMuscle.sort();
+
+            // Update modal content
+            document.getElementById('exerciseModalTitle').textContent = muscleName;
+            
+            const exerciseList = document.getElementById('exerciseModalList');
+            exerciseList.innerHTML = '';
+            
+            if (exercisesForMuscle.length === 0) {
+                exerciseList.innerHTML = '<li class="exercise-list-item">No exercises found for this muscle group.</li>';
+            } else {
+                exercisesForMuscle.forEach(exercise => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'exercise-list-item';
+                    listItem.textContent = exercise;
+                    
+                    // Add click handler to quickly add exercise
+                    listItem.addEventListener('click', () => {
+                        // Set the exercise in the main form
+                        const exerciseSelect = document.getElementById('exercise');
+                        if (exerciseSelect) {
+                            exerciseSelect.value = exercise;
+                        }
+                        hideExerciseModal();
+                        
+                        // Scroll to input section
+                        document.querySelector('.input-section').scrollIntoView({ behavior: 'smooth' });
+                        
+                        // Add haptic feedback
+                        if (window.addHapticFeedback) window.addHapticFeedback();
+                        
+                        // Show feedback
+                        showPlanningFeedback(`✅ Selected: ${exercise}`, '#4CAF50');
+                    });
+                    
+                    exerciseList.appendChild(listItem);
+                });
+            }
+
+            // Show modal
+            document.getElementById('exerciseModal').classList.add('visible');
+            
+            // Add haptic feedback
+            if (window.addHapticFeedback) window.addHapticFeedback();
+        }
+
+        function hideExerciseModal() {
+            document.getElementById('exerciseModal').classList.remove('visible');
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('exerciseModal');
+            if (event.target === modal) {
+                hideExerciseModal();
+            }
+        });
 
         // Export data to text format
         function exportData() {
