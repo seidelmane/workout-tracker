@@ -192,15 +192,6 @@
             font-size: 12px;
         }
 
-        .workout-breakdown {
-            background: rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 6px;
-            padding: 8px;
-            margin: 8px 0;
-            font-size: 11px;
-        }
-
         .breakdown-item {
             display: flex;
             justify-content: space-between;
@@ -233,6 +224,39 @@
             color: #2E7D32;
         }
 
+        .modal-progress-section {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .modal-progress-section h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .modal-progress-bar .progress-bar {
+            height: 24px;
+        }
+
+        .modal-breakdown {
+            margin-top: 12px;
+        }
+
+        .modal-breakdown .breakdown-item {
+            padding: 4px 0;
+            font-size: 12px;
+            border: none;
+        }
+
+        .modal-breakdown .fulfillment-info {
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
         .muscle-progress {
             margin-bottom: 8px;
         }
@@ -244,6 +268,33 @@
             border-radius: 4px;
             overflow: hidden;
             margin-bottom: 4px;
+        }
+
+        .progress-bar.segmented {
+            height: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .progress-segment:last-child {
+            border-right: none;
+        }
+
+        .segment-label {
+            pointer-events: none;
+            white-space: nowrap;
         }
 
         .progress-fill {
@@ -1872,6 +1923,46 @@
             return Math.max(0, daysUntilExpiry);
         }
 
+        function createSegmentedProgressBar(workoutBreakdown, totalSets, weeklyTarget, progressPercent) {
+            if (workoutBreakdown.length === 0) {
+                // Empty progress bar
+                return `<div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%; background-color: #f44336;"></div>
+                </div>`;
+            }
+
+            // Determine base color based on goal progress
+            let baseColor;
+            if (progressPercent >= 100) baseColor = { r: 76, g: 175, b: 80 }; // Green
+            else if (progressPercent >= 75) baseColor = { r: 255, g: 193, b: 7 }; // Yellow  
+            else if (progressPercent >= 50) baseColor = { r: 255, g: 152, b: 0 }; // Orange
+            else baseColor = { r: 244, g: 67, b: 54 }; // Red
+
+            // Create segments
+            const segments = workoutBreakdown.map((workout, index) => {
+                // Calculate opacity based on freshness (newer = more opaque)
+                const maxOpacity = 1.0;
+                const minOpacity = 0.4;
+                const opacityStep = (maxOpacity - minOpacity) / Math.max(workoutBreakdown.length - 1, 1);
+                const opacity = maxOpacity - (workout.daysAgo * opacityStep * 0.8);
+                
+                // Calculate segment width as percentage of total
+                const segmentPercent = (workout.sets / totalSets) * Math.min(progressPercent, 100);
+                
+                // Create rgba color with opacity
+                const segmentColor = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${Math.max(opacity, minOpacity)})`;
+                
+                return `<div class="progress-segment" 
+                    style="width: ${segmentPercent}%; background-color: ${segmentColor}; position: relative;">
+                    <span class="segment-label">${workout.sets}</span>
+                </div>`;
+            }).join('');
+
+            return `<div class="progress-bar segmented">
+                ${segments}
+            </div>`;
+        }
+
         // Populate exercise dropdown
         function populateExerciseDropdown() {
             const select = document.getElementById('exercise');
@@ -1964,40 +2055,19 @@
                     }
                 }
                 
-                // Generate workout breakdown display
-                let breakdownHtml = '';
-                if (workoutBreakdown.length > 0) {
-                    const breakdownItems = workoutBreakdown.map(workout => 
-                        `<div class="breakdown-item">
-                            <span class="breakdown-sets">${workout.sets} sets</span> 
-                            <span class="breakdown-date">${workout.dayName} (${workout.shortDate})</span>
-                        </div>`
-                    ).join('');
-                    
-                    const fulfillmentText = isOverTarget && fulfillmentDays > 0 ? 
-                        `<div class="fulfillment-info">Goal met for ${fulfillmentDays} more day${fulfillmentDays !== 1 ? 's' : ''}</div>` : '';
-                    
-                    breakdownHtml = `
-                        <div class="workout-breakdown">
-                            ${breakdownItems}
-                            ${fulfillmentText}
-                        </div>
-                    `;
-                }
+                // Create segmented progress bar
+                const segmentedProgressBar = createSegmentedProgressBar(workoutBreakdown, last7DaysData.sets, weeklyTarget, progressPercent);
                 
                 card.innerHTML = `
                     <div class="muscle-name">${muscle}</div>
                     <div class="muscle-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${Math.min(progressPercent, 100)}%; background-color: ${progressColor};"></div>
-                        </div>
+                        ${segmentedProgressBar}
                         <div class="progress-text">${last7DaysData.sets}/${weeklyTarget} sets ${isOverTarget ? '✅' : ''}</div>
                     </div>
                     <div class="muscle-stats">
                         <span class="reps-count">${last7DaysData.reps} reps (7d)</span>
                         ${todayBadgeContent}
                     </div>
-                    ${breakdownHtml}
                     <div class="freshness">${freshnessText}</div>
                 `;
                 
@@ -2374,6 +2444,15 @@
 
         // Exercise Modal Functions
         function showExercisesForMuscle(muscleName) {
+            // Get muscle data for this muscle
+            const data = muscleData[muscleName] || { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
+            const workoutBreakdown = getWorkoutBreakdown(data);
+            const last7DaysData = getLast7DaysData(data);
+            const weeklyTarget = weeklyTargets[muscleName] || 12;
+            const progressPercent = Math.min((last7DaysData.sets / weeklyTarget) * 100, 100);
+            const isOverTarget = last7DaysData.sets > weeklyTarget;
+            const fulfillmentDays = calculateGoalFulfillmentDuration(data, weeklyTarget);
+
             // Find all exercises that target this muscle
             const exercisesForMuscle = [];
             Object.entries(exerciseDatabase).forEach(([exercise, muscles]) => {
@@ -2387,6 +2466,48 @@
 
             // Update modal content
             document.getElementById('exerciseModalTitle').textContent = muscleName;
+            
+            // Create detailed progress section
+            const segmentedProgressBar = createSegmentedProgressBar(workoutBreakdown, last7DaysData.sets, weeklyTarget, progressPercent);
+            
+            let progressDetailHtml = `
+                <div class="modal-progress-section">
+                    <h4>Progress Details</h4>
+                    <div class="modal-progress-bar">
+                        ${segmentedProgressBar}
+                        <div class="progress-text">${last7DaysData.sets}/${weeklyTarget} sets ${isOverTarget ? '✅' : ''}</div>
+                    </div>
+            `;
+            
+            if (workoutBreakdown.length > 0) {
+                const breakdownItems = workoutBreakdown.map(workout => 
+                    `<div class="breakdown-item">
+                        <span class="breakdown-sets">• ${workout.sets} sets</span> 
+                        <span class="breakdown-date">from ${workout.dayName}</span>
+                    </div>`
+                ).join('');
+                
+                const fulfillmentText = isOverTarget && fulfillmentDays > 0 ? 
+                    `<div class="fulfillment-info"><strong>Goal met until ${new Date(Date.now() + fulfillmentDays * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</strong></div>` : '';
+                
+                progressDetailHtml += `
+                    <div class="modal-breakdown">
+                        ${breakdownItems}
+                        ${fulfillmentText}
+                    </div>
+                `;
+            }
+            
+            progressDetailHtml += `</div>`;
+            
+            // Insert progress section before exercise list
+            const modalContent = document.querySelector('.modal-content');
+            const existingProgress = modalContent.querySelector('.modal-progress-section');
+            if (existingProgress) {
+                existingProgress.remove();
+            }
+            const titleElement = document.getElementById('exerciseModalTitle');
+            titleElement.insertAdjacentHTML('afterend', progressDetailHtml);
             
             const exerciseList = document.getElementById('exerciseModalList');
             exerciseList.innerHTML = '';
