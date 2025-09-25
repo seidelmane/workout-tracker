@@ -192,6 +192,47 @@
             font-size: 12px;
         }
 
+        .workout-breakdown {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            padding: 8px;
+            margin: 8px 0;
+            font-size: 11px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .breakdown-item:last-of-type {
+            border-bottom: none;
+        }
+
+        .breakdown-sets {
+            font-weight: 600;
+            color: #2196F3;
+        }
+
+        .breakdown-date {
+            color: #666;
+            font-size: 10px;
+        }
+
+        .fulfillment-info {
+            margin-top: 6px;
+            padding: 4px 6px;
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 3px solid #4CAF50;
+            font-size: 10px;
+            font-weight: 600;
+            color: #2E7D32;
+        }
+
         .muscle-progress {
             margin-bottom: 8px;
         }
@@ -1770,6 +1811,67 @@
             return { sets: totalSets, reps: totalReps };
         }
 
+        function getWorkoutBreakdown(muscleData) {
+            const today = new Date();
+            const workoutDays = [];
+            
+            // Look through last 7 days and find days with workouts
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateString = date.getFullYear() + '-' + 
+                                 String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                                 String(date.getDate()).padStart(2, '0');
+                
+                if (muscleData.dailyData && muscleData.dailyData[dateString]) {
+                    const dayData = muscleData.dailyData[dateString];
+                    if (dayData.sets > 0) {
+                        // Format date nicely
+                        const dayName = i === 0 ? 'Today' : 
+                                       i === 1 ? 'Yesterday' : 
+                                       `${i} days ago`;
+                        const shortDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        
+                        workoutDays.push({
+                            daysAgo: i,
+                            dateString,
+                            dayName,
+                            shortDate,
+                            sets: dayData.sets,
+                            reps: dayData.reps
+                        });
+                    }
+                }
+            }
+            
+            // Sort by most recent first
+            workoutDays.sort((a, b) => a.daysAgo - b.daysAgo);
+            
+            return workoutDays;
+        }
+
+        function calculateGoalFulfillmentDuration(muscleData, weeklyTarget) {
+            const today = new Date();
+            const workoutBreakdown = getWorkoutBreakdown(muscleData);
+            
+            if (workoutBreakdown.length === 0) return 0;
+            
+            // Find the oldest workout that contributes to current goal
+            const oldestWorkout = workoutBreakdown[workoutBreakdown.length - 1];
+            if (!oldestWorkout) return 0;
+            
+            // Calculate when this oldest workout will "expire" from the 7-day window
+            const oldestDate = new Date(oldestWorkout.dateString);
+            const expiryDate = new Date(oldestDate);
+            expiryDate.setDate(expiryDate.getDate() + 7);
+            
+            // Calculate days until expiry
+            const msPerDay = 24 * 60 * 60 * 1000;
+            const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / msPerDay);
+            
+            return Math.max(0, daysUntilExpiry);
+        }
+
         // Populate exercise dropdown
         function populateExerciseDropdown() {
             const select = document.getElementById('exercise');
@@ -1824,11 +1926,13 @@
                 
                 // Get last 7 days data
                 const last7DaysData = getLast7DaysData(data);
+                const workoutBreakdown = getWorkoutBreakdown(data);
                 
                 // Get weekly target
                 const weeklyTarget = weeklyTargets[muscle] || 12; // Default to 12 if not set
                 const progressPercent = Math.min((last7DaysData.sets / weeklyTarget) * 100, 100);
                 const isOverTarget = last7DaysData.sets > weeklyTarget;
+                const fulfillmentDays = calculateGoalFulfillmentDuration(data, weeklyTarget);
                 
                 const card = document.createElement('div');
                 card.className = 'muscle-card';
@@ -1860,6 +1964,27 @@
                     }
                 }
                 
+                // Generate workout breakdown display
+                let breakdownHtml = '';
+                if (workoutBreakdown.length > 0) {
+                    const breakdownItems = workoutBreakdown.map(workout => 
+                        `<div class="breakdown-item">
+                            <span class="breakdown-sets">${workout.sets} sets</span> 
+                            <span class="breakdown-date">${workout.dayName} (${workout.shortDate})</span>
+                        </div>`
+                    ).join('');
+                    
+                    const fulfillmentText = isOverTarget && fulfillmentDays > 0 ? 
+                        `<div class="fulfillment-info">Goal met for ${fulfillmentDays} more day${fulfillmentDays !== 1 ? 's' : ''}</div>` : '';
+                    
+                    breakdownHtml = `
+                        <div class="workout-breakdown">
+                            ${breakdownItems}
+                            ${fulfillmentText}
+                        </div>
+                    `;
+                }
+                
                 card.innerHTML = `
                     <div class="muscle-name">${muscle}</div>
                     <div class="muscle-progress">
@@ -1872,6 +1997,7 @@
                         <span class="reps-count">${last7DaysData.reps} reps (7d)</span>
                         ${todayBadgeContent}
                     </div>
+                    ${breakdownHtml}
                     <div class="freshness">${freshnessText}</div>
                 `;
                 
