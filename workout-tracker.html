@@ -2466,6 +2466,7 @@
         // Exercise Modal Functions
         function showExercisesForMuscle(muscleName) {
             console.log('Opening modal for:', muscleName);
+            alert('Modal function called for: ' + muscleName); // Temporary debug
             // Get muscle data for this muscle
             const data = muscleData[muscleName] || { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
             const workoutBreakdown = getWorkoutBreakdown(data);
@@ -2567,7 +2568,11 @@
             }
 
             // Show modal
-            document.getElementById('exerciseModal').classList.add('visible');
+            console.log('Attempting to show modal...');
+            const modal = document.getElementById('exerciseModal');
+            console.log('Modal element found:', modal);
+            modal.classList.add('visible');
+            console.log('Modal should now be visible');
             
             // Add haptic feedback
             if (window.addHapticFeedback) window.addHapticFeedback();
