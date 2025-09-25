@@ -2600,13 +2600,22 @@
         }
 
         function hideExerciseModal() {
-            document.getElementById('exerciseModal').classList.remove('visible');
+            const modal = document.getElementById('exerciseModal');
+            console.log('Hiding modal:', modal, 'Has visible class:', modal.classList.contains('visible'));
+            modal.classList.remove('visible');
+            console.log('After hiding - Has visible class:', modal.classList.contains('visible'));
         }
 
-        // Close button event listener
-        document.getElementById('closeModalButton').addEventListener('click', function(event) {
-            event.stopPropagation(); // Prevent event bubbling
-            hideExerciseModal();
+        // Initialize close button event listener when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const closeButton = document.getElementById('closeModalButton');
+            if (closeButton) {
+                closeButton.addEventListener('click', function(event) {
+                    console.log('Close button clicked');
+                    event.stopPropagation(); // Prevent event bubbling
+                    hideExerciseModal();
+                });
+            }
         });
 
         // Close modal when clicking outside
