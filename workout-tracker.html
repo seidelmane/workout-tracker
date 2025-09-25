@@ -2603,7 +2603,9 @@
             const modal = document.getElementById('exerciseModal');
             console.log('Hiding modal:', modal, 'Has visible class:', modal.classList.contains('visible'));
             modal.classList.remove('visible');
-            console.log('After hiding - Has visible class:', modal.classList.contains('visible'));
+            // Remove the inline display style that was set as a backup
+            modal.style.display = '';
+            console.log('After hiding - Has visible class:', modal.classList.contains('visible'), 'Display style:', modal.style.display);
         }
 
         // Initialize close button event listener when DOM is ready
