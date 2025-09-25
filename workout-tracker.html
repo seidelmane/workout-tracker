@@ -1045,6 +1045,19 @@
                 font-size: 16px; /* Prevents iOS zoom */
             }
         }
+        
+        /* Improve mobile input stability */
+        input[type="number"] {
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+            appearance: none;
+        }
+        
+        /* Prevent input blur on mobile */
+        input[type="number"]:focus {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         /* Improve touch targets for iPhone */
         .btn, .btn-small, .nav-btn, .date-quick-btn {
@@ -2468,6 +2481,61 @@
             }
         }
 
+        // Prevent mobile keyboard issues
+        function fixMobileInputs() {
+            // Fix dropdown selection not interfering with inputs
+            document.querySelectorAll('.section-form select').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    // Prevent the select change from affecting input focus
+                    e.stopPropagation();
+                    // Focus the first input after selection
+                    const form = select.closest('form');
+                    const firstInput = form.querySelector('input[type="number"]');
+                    if (firstInput && select.value) {
+                        setTimeout(() => {
+                            firstInput.focus();
+                        }, 100);
+                    }
+                });
+            });
+            
+            // Add listeners to prevent keyboard dismissal
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                // Prevent blur unless user is actually done
+                let userInitiatedBlur = false;
+                
+                input.addEventListener('touchstart', () => {
+                    userInitiatedBlur = false;
+                });
+                
+                input.addEventListener('focus', () => {
+                    userInitiatedBlur = false;
+                    // Ensure inputmode is set for mobile keyboards
+                    if (!input.hasAttribute('inputmode')) {
+                        input.setAttribute('inputmode', 'numeric');
+                    }
+                });
+                
+                input.addEventListener('blur', (e) => {
+                    // If this wasn't user-initiated, refocus
+                    if (!userInitiatedBlur && document.activeElement !== input) {
+                        setTimeout(() => {
+                            if (input.parentNode && input.value === '') {
+                                input.focus();
+                            }
+                        }, 50);
+                    }
+                });
+                
+                // Mark blur as user-initiated for certain events
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === 'Tab') {
+                        userInitiatedBlur = true;
+                    }
+                });
+            });
+        }
+
         // Handle section-specific form submissions
         function setupSectionForms() {
             document.querySelectorAll('.section-form').forEach(form => {
@@ -2482,7 +2550,10 @@
                     const sets = parseInt(setsInput.value);
                     const reps = parseInt(repsInput.value);
                     
-                    if (!exercise || sets === 0 || reps <= 0 || isNaN(sets) || isNaN(reps)) return;
+                    if (!exercise || sets === 0 || reps <= 0 || isNaN(sets) || isNaN(reps)) {
+                        // Don't blur inputs on validation failure
+                        return;
+                    }
                     
                     // Get the selected date for this section
                     const sectionId = this.dataset.section;
@@ -2921,6 +2992,7 @@
             initializeDatePickers(); // Initialize date picker functionality
             restoreActiveSection(); // Restore last viewed section
             initMobileOptimizations(); // iPhone-specific optimizations
+            fixMobileInputs(); // Fix mobile keyboard issues
         }
 
         // Start the app when DOM is ready
