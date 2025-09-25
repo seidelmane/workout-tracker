@@ -242,6 +242,12 @@
             height: 24px;
         }
 
+        .modal-reps-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
         .modal-breakdown {
             margin-top: 12px;
         }
@@ -255,6 +261,17 @@
         .modal-breakdown .fulfillment-info {
             margin-top: 10px;
             font-size: 12px;
+        }
+
+        .card-fulfillment {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 3px solid #4CAF50;
+            padding: 4px 8px;
+            margin: 8px 0 4px 0;
+            font-size: 10px;
+            font-weight: 600;
+            color: #2E7D32;
+            border-radius: 0 4px 4px 0;
         }
 
         .muscle-progress {
@@ -2058,6 +2075,10 @@
                 // Create segmented progress bar
                 const segmentedProgressBar = createSegmentedProgressBar(workoutBreakdown, last7DaysData.sets, weeklyTarget, progressPercent);
                 
+                // Goal fulfillment display
+                const fulfillmentText = isOverTarget && fulfillmentDays > 0 ? 
+                    `<div class="card-fulfillment">Goal met until ${new Date(Date.now() + fulfillmentDays * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>` : '';
+                
                 card.innerHTML = `
                     <div class="muscle-name">${muscle}</div>
                     <div class="muscle-progress">
@@ -2065,9 +2086,9 @@
                         <div class="progress-text">${last7DaysData.sets}/${weeklyTarget} sets ${isOverTarget ? '✅' : ''}</div>
                     </div>
                     <div class="muscle-stats">
-                        <span class="reps-count">${last7DaysData.reps} reps (7d)</span>
                         ${todayBadgeContent}
                     </div>
+                    ${fulfillmentText}
                     <div class="freshness">${freshnessText}</div>
                 `;
                 
@@ -2444,6 +2465,7 @@
 
         // Exercise Modal Functions
         function showExercisesForMuscle(muscleName) {
+            console.log('Opening modal for:', muscleName);
             // Get muscle data for this muscle
             const data = muscleData[muscleName] || { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
             const workoutBreakdown = getWorkoutBreakdown(data);
@@ -2476,6 +2498,7 @@
                     <div class="modal-progress-bar">
                         ${segmentedProgressBar}
                         <div class="progress-text">${last7DaysData.sets}/${weeklyTarget} sets ${isOverTarget ? '✅' : ''}</div>
+                        <div class="modal-reps-text">${last7DaysData.reps} total reps (7 days)</div>
                     </div>
             `;
             
