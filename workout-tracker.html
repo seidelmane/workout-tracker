@@ -1280,7 +1280,7 @@
             </div>
             <div class="exercise-modal-body">
                 <ul class="exercise-list" id="exerciseModalList"></ul>
-                <button class="close-modal" onclick="hideExerciseModal()">Close</button>
+                <button class="close-modal" id="closeModalButton">Close</button>
             </div>
         </div>
     </div>
@@ -2603,13 +2603,18 @@
             document.getElementById('exerciseModal').classList.remove('visible');
         }
 
+        // Close button event listener
+        document.getElementById('closeModalButton').addEventListener('click', function(event) {
+            event.stopPropagation(); // Prevent event bubbling
+            hideExerciseModal();
+        });
+
         // Close modal when clicking outside
         document.addEventListener('click', function(event) {
             const modal = document.getElementById('exerciseModal');
-            const modalContent = modal.querySelector('.exercise-modal-content');
             
-            // Close modal if clicking on backdrop (not on modal content)
-            if (modal.classList.contains('visible') && !modalContent.contains(event.target)) {
+            // Close modal only if clicking directly on the modal backdrop
+            if (modal.classList.contains('visible') && event.target === modal) {
                 hideExerciseModal();
             }
         });
