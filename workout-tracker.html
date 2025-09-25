@@ -2606,8 +2606,21 @@
         // Close modal when clicking outside
         document.addEventListener('click', function(event) {
             const modal = document.getElementById('exerciseModal');
-            if (event.target === modal) {
+            const modalContent = modal.querySelector('.exercise-modal-content');
+            
+            // Close modal if clicking on backdrop (not on modal content)
+            if (modal.classList.contains('visible') && !modalContent.contains(event.target)) {
                 hideExerciseModal();
+            }
+        });
+
+        // Close modal when pressing ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('exerciseModal');
+                if (modal.classList.contains('visible')) {
+                    hideExerciseModal();
+                }
             }
         });
 
