@@ -1994,46 +1994,64 @@
         }
 
         function calculateEMAWeeklyAverages(muscleData) {
-            const today = new Date();
-            const weeklyTotals = [];
-            
-            // Calculate weekly totals for the past 5 weeks (enough for 30-day EMA)
-            for (let week = 0; week < 5; week++) {
-                const weekStart = new Date(today);
-                weekStart.setDate(weekStart.getDate() - (week * 7 + today.getDay()));
-                weekStart.setHours(0, 0, 0, 0);
+            try {
+                const today = new Date();
+                const weeklyTotals = [];
                 
-                const weekEnd = new Date(weekStart);
-                weekEnd.setDate(weekEnd.getDate() + 6);
-                weekEnd.setHours(23, 59, 59, 999);
-                
-                let weekSets = 0;
-                muscleData.forEach(workout => {
-                    const workoutDate = new Date(workout.date);
-                    if (workoutDate >= weekStart && workoutDate <= weekEnd) {
-                        weekSets += workout.sets || 0;
+                // Calculate weekly totals for the past 5 weeks (enough for 30-day EMA)
+                for (let week = 0; week < 5; week++) {
+                    const weekStart = new Date(today.getTime());
+                    weekStart.setDate(weekStart.getDate() - (week * 7 + today.getDay()));
+                    weekStart.setHours(0, 0, 0, 0);
+                    
+                    const weekEnd = new Date(weekStart.getTime());
+                    weekEnd.setDate(weekEnd.getDate() + 6);
+                    weekEnd.setHours(23, 59, 59, 999);
+                    
+                    let weekSets = 0;
+                    if (muscleData && muscleData.length > 0) {
+                        for (let i = 0; i < muscleData.length; i++) {
+                            const workout = muscleData[i];
+                            if (workout && workout.date) {
+                                const workoutDate = new Date(workout.date);
+                                if (workoutDate >= weekStart && workoutDate <= weekEnd) {
+                                    weekSets += (workout.sets || 0);
+                                }
+                            }
+                        }
                     }
-                });
-                
-                weeklyTotals.unshift(weekSets); // Add to beginning for chronological order
-            }
-            
-            // Calculate EMAs with different smoothing factors
-            const calculateEMA = (data, alpha) => {
-                if (data.length === 0) return 0;
-                let ema = data[0];
-                for (let i = 1; i < data.length; i++) {
-                    ema = alpha * data[i] + (1 - alpha) * ema;
+                    
+                    weeklyTotals.unshift(weekSets); // Add to beginning for chronological order
                 }
-                return ema;
-            };
-            
-            return {
-                recent: calculateEMA(weeklyTotals.slice(-1), 1), // Current week
-                short: calculateEMA(weeklyTotals.slice(-2), 2/8), // 7-day EMA (2 weeks)
-                medium: calculateEMA(weeklyTotals.slice(-3), 2/15), // 14-day EMA (3 weeks) 
-                long: calculateEMA(weeklyTotals, 2/31) // 30-day EMA (5 weeks)
-            };
+                
+                // Simple calculation - avoid complex array operations
+                const recent = weeklyTotals.length > 0 ? weeklyTotals[weeklyTotals.length - 1] : 0;
+                let short = 0, medium = 0, long = 0;
+                
+                if (weeklyTotals.length >= 2) {
+                    short = (weeklyTotals[weeklyTotals.length - 1] + weeklyTotals[weeklyTotals.length - 2]) / 2;
+                }
+                if (weeklyTotals.length >= 3) {
+                    medium = (weeklyTotals[weeklyTotals.length - 1] + weeklyTotals[weeklyTotals.length - 2] + weeklyTotals[weeklyTotals.length - 3]) / 3;
+                }
+                if (weeklyTotals.length >= 4) {
+                    let sum = 0;
+                    for (let i = 0; i < weeklyTotals.length; i++) {
+                        sum += weeklyTotals[i];
+                    }
+                    long = sum / weeklyTotals.length;
+                }
+                
+                return {
+                    recent: recent,
+                    short: short,
+                    medium: medium,
+                    long: long
+                };
+            } catch (error) {
+                console.error('EMA calculation error:', error);
+                return { recent: 0, short: 0, medium: 0, long: 0 };
+            }
         }
 
         function createSegmentedProgressBar(workoutBreakdown, totalSets, weeklyTarget, progressPercent) {
@@ -2585,11 +2603,8 @@
             document.getElementById('exerciseModalTitle').textContent = muscleName;
             
             try {
-                console.log('Building progress section for:', muscleName, 'Sets:', last7DaysData.sets, 'Target:', weeklyTarget);
-
                 // Create detailed progress section
                 const segmentedProgressBar = createSegmentedProgressBar(workoutBreakdown, last7DaysData.sets, weeklyTarget, progressPercent);
-                console.log('Segmented progress bar created:', segmentedProgressBar ? 'SUCCESS' : 'FAILED');
                 
                 let progressDetailHtml = `
                     <div class="modal-progress-section">
@@ -2613,62 +2628,39 @@
                         `<div class="fulfillment-info"><strong>Goal met until ${formatGoalDate(fulfillmentDays, false)}</strong></div>` : '';
                     
                     // Calculate EMA trends
-                    console.log('Calculating EMA for muscle data:', data.length, 'workouts');
-                    let emaData;
-                    try {
-                        emaData = calculateEMAWeeklyAverages(data);
-                        console.log('EMA data calculated:', emaData);
-                    } catch (emaError) {
-                        console.error('EMA calculation failed:', emaError);
-                        // Fallback to simple averages if EMA fails
-                        emaData = { recent: 0, short: 0, medium: 0, long: 0 };
-                    }
-                    let trendsHtml = '';
-                    try {
-                        trendsHtml = `
-                            <div class="trends-section">
-                                <h4>📊 Weekly Volume Trends</h4>
-                                <div class="trend-item">
-                                    <span class="trend-label">Current week:</span>
-                                    <span class="trend-value">${(emaData.recent || 0).toFixed(1)} sets/week</span>
-                                </div>
-                                <div class="trend-item">
-                                    <span class="trend-label">Short-term (2-week):</span>
-                                    <span class="trend-value">${(emaData.short || 0).toFixed(1)} sets/week</span>
-                                </div>
-                                <div class="trend-item">
-                                    <span class="trend-label">Medium-term (3-week):</span>
-                                    <span class="trend-value">${(emaData.medium || 0).toFixed(1)} sets/week</span>
-                                </div>
-                                <div class="trend-item">
-                                    <span class="trend-label">Long-term (5-week):</span>
-                                    <span class="trend-value">${(emaData.long || 0).toFixed(1)} sets/week</span>
-                                </div>
+                    const emaData = calculateEMAWeeklyAverages(data);
+                    const trendsHtml = `
+                        <div class="trends-section">
+                            <h4>📊 Weekly Volume Trends</h4>
+                            <div class="trend-item">
+                                <span class="trend-label">Current week:</span>
+                                <span class="trend-value">${(emaData.recent || 0).toFixed(1)} sets/week</span>
                             </div>
-                        `;
-                        console.log('Trends HTML created successfully');
-                    } catch (trendsError) {
-                        console.error('Failed to create trends HTML:', trendsError);
-                        trendsHtml = '<div class="trends-section"><p>Trends temporarily unavailable</p></div>';
-                    }
+                            <div class="trend-item">
+                                <span class="trend-label">Short-term (2-week):</span>
+                                <span class="trend-value">${(emaData.short || 0).toFixed(1)} sets/week</span>
+                            </div>
+                            <div class="trend-item">
+                                <span class="trend-label">Medium-term (3-week):</span>
+                                <span class="trend-value">${(emaData.medium || 0).toFixed(1)} sets/week</span>
+                            </div>
+                            <div class="trend-item">
+                                <span class="trend-label">Long-term (5-week):</span>
+                                <span class="trend-value">${(emaData.long || 0).toFixed(1)} sets/week</span>
+                            </div>
+                        </div>
+                    `;
                     
                     progressDetailHtml += `
                         <div class="modal-breakdown">
                             ${breakdownItems}
                             ${fulfillmentText}
+                            ${trendsHtml}
                         </div>
                     `;
-                    
-                    // Temporarily disable trends for mobile debugging
-                    if (false) {
-                        progressDetailHtml = progressDetailHtml.replace('</div>    `;', trendsHtml + '</div>    `;');
-                    }
                 }
                 
                 progressDetailHtml += `</div>`;
-                
-                console.log('Final progress HTML length:', progressDetailHtml.length);
-                console.log('Progress HTML preview:', progressDetailHtml.substring(0, 200) + '...');
                 
                 // Insert progress section before exercise list
                 const modalContent = document.querySelector('.exercise-modal-content');
@@ -2677,9 +2669,7 @@
                     existingProgress.remove();
                 }
                 const titleElement = document.getElementById('exerciseModalTitle');
-                console.log('Title element found:', titleElement);
                 titleElement.insertAdjacentHTML('afterend', progressDetailHtml);
-                console.log('Progress section inserted');
             } catch (error) {
                 console.error('Error creating progress section:', error);
                 // Skip progress section on error, but still show modal
