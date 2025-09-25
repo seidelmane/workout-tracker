@@ -2490,48 +2490,58 @@
             // Update modal content
             document.getElementById('exerciseModalTitle').textContent = muscleName;
             
-            // Create detailed progress section
-            const segmentedProgressBar = createSegmentedProgressBar(workoutBreakdown, last7DaysData.sets, weeklyTarget, progressPercent);
-            
-            let progressDetailHtml = `
-                <div class="modal-progress-section">
-                    <h4>Progress Details</h4>
-                    <div class="modal-progress-bar">
-                        ${segmentedProgressBar}
-                        <div class="progress-text">${last7DaysData.sets}/${weeklyTarget} sets ${isOverTarget ? '✅' : ''}</div>
-                        <div class="modal-reps-text">${last7DaysData.reps} total reps (7 days)</div>
-                    </div>
-            `;
-            
-            if (workoutBreakdown.length > 0) {
-                const breakdownItems = workoutBreakdown.map(workout => 
-                    `<div class="breakdown-item">
-                        <span class="breakdown-sets">• ${workout.sets} sets</span> 
-                        <span class="breakdown-date">from ${workout.dayName}</span>
-                    </div>`
-                ).join('');
+            try {
+                console.log('Creating progress section...');
+                // Create detailed progress section
+                const segmentedProgressBar = createSegmentedProgressBar(workoutBreakdown, last7DaysData.sets, weeklyTarget, progressPercent);
                 
-                const fulfillmentText = isOverTarget && fulfillmentDays > 0 ? 
-                    `<div class="fulfillment-info"><strong>Goal met until ${new Date(Date.now() + fulfillmentDays * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</strong></div>` : '';
-                
-                progressDetailHtml += `
-                    <div class="modal-breakdown">
-                        ${breakdownItems}
-                        ${fulfillmentText}
-                    </div>
+                let progressDetailHtml = `
+                    <div class="modal-progress-section">
+                        <h4>Progress Details</h4>
+                        <div class="modal-progress-bar">
+                            ${segmentedProgressBar}
+                            <div class="progress-text">${last7DaysData.sets}/${weeklyTarget} sets ${isOverTarget ? '✅' : ''}</div>
+                            <div class="modal-reps-text">${last7DaysData.reps} total reps (7 days)</div>
+                        </div>
                 `;
+                
+                if (workoutBreakdown.length > 0) {
+                    const breakdownItems = workoutBreakdown.map(workout => 
+                        `<div class="breakdown-item">
+                            <span class="breakdown-sets">• ${workout.sets} sets</span> 
+                            <span class="breakdown-date">from ${workout.dayName}</span>
+                        </div>`
+                    ).join('');
+                    
+                    const fulfillmentText = isOverTarget && fulfillmentDays > 0 ? 
+                        `<div class="fulfillment-info"><strong>Goal met until ${new Date(Date.now() + fulfillmentDays * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</strong></div>` : '';
+                    
+                    progressDetailHtml += `
+                        <div class="modal-breakdown">
+                            ${breakdownItems}
+                            ${fulfillmentText}
+                        </div>
+                    `;
+                }
+                
+                progressDetailHtml += `</div>`;
+                
+                console.log('Finding modal content elements...');
+                // Insert progress section before exercise list
+                const modalContent = document.querySelector('.modal-content');
+                console.log('Modal content found:', modalContent);
+                const existingProgress = modalContent.querySelector('.modal-progress-section');
+                if (existingProgress) {
+                    existingProgress.remove();
+                }
+                const titleElement = document.getElementById('exerciseModalTitle');
+                console.log('Title element found:', titleElement);
+                titleElement.insertAdjacentHTML('afterend', progressDetailHtml);
+                console.log('Progress section inserted');
+            } catch (error) {
+                console.error('Error creating progress section:', error);
+                alert('Error in progress section: ' + error.message);
             }
-            
-            progressDetailHtml += `</div>`;
-            
-            // Insert progress section before exercise list
-            const modalContent = document.querySelector('.modal-content');
-            const existingProgress = modalContent.querySelector('.modal-progress-section');
-            if (existingProgress) {
-                existingProgress.remove();
-            }
-            const titleElement = document.getElementById('exerciseModalTitle');
-            titleElement.insertAdjacentHTML('afterend', progressDetailHtml);
             
             const exerciseList = document.getElementById('exerciseModalList');
             exerciseList.innerHTML = '';
@@ -2571,7 +2581,19 @@
             console.log('Attempting to show modal...');
             const modal = document.getElementById('exerciseModal');
             console.log('Modal element found:', modal);
+            
+            if (!modal) {
+                alert('ERROR: Modal element not found!');
+                return;
+            }
+            
+            console.log('Modal classList before:', modal.classList.toString());
             modal.classList.add('visible');
+            console.log('Modal classList after:', modal.classList.toString());
+            
+            // Force modal to be visible as backup
+            modal.style.display = 'flex';
+            
             console.log('Modal should now be visible');
             
             // Add haptic feedback
