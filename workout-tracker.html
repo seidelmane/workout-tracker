@@ -274,6 +274,39 @@
             border-radius: 0 4px 4px 0;
         }
 
+        .trends-section {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(79, 172, 254, 0.08);
+            border-radius: 8px;
+            border-left: 3px solid #4facfe;
+        }
+
+        .trends-section h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .trend-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+
+        .trend-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .trend-value {
+            font-weight: 600;
+            color: #4facfe;
+        }
+
         .muscle-progress {
             margin-bottom: 8px;
         }
@@ -1940,6 +1973,69 @@
             return Math.max(0, daysUntilExpiry);
         }
 
+        function formatGoalDate(days, shortFormat = false) {
+            const today = new Date();
+            const targetDate = new Date(today);
+            targetDate.setDate(targetDate.getDate() + days);
+            
+            const dayNames = shortFormat 
+                ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+                : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            
+            const monthNames = shortFormat
+                ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            const dayName = dayNames[targetDate.getDay()];
+            const monthName = monthNames[targetDate.getMonth()];
+            const day = targetDate.getDate();
+            
+            return `${dayName}${shortFormat ? ',' : ''} ${monthName} ${day}`;
+        }
+
+        function calculateEMAWeeklyAverages(muscleData) {
+            const today = new Date();
+            const weeklyTotals = [];
+            
+            // Calculate weekly totals for the past 5 weeks (enough for 30-day EMA)
+            for (let week = 0; week < 5; week++) {
+                const weekStart = new Date(today);
+                weekStart.setDate(weekStart.getDate() - (week * 7 + today.getDay()));
+                weekStart.setHours(0, 0, 0, 0);
+                
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                weekEnd.setHours(23, 59, 59, 999);
+                
+                let weekSets = 0;
+                muscleData.forEach(workout => {
+                    const workoutDate = new Date(workout.date);
+                    if (workoutDate >= weekStart && workoutDate <= weekEnd) {
+                        weekSets += workout.sets || 0;
+                    }
+                });
+                
+                weeklyTotals.unshift(weekSets); // Add to beginning for chronological order
+            }
+            
+            // Calculate EMAs with different smoothing factors
+            const calculateEMA = (data, alpha) => {
+                if (data.length === 0) return 0;
+                let ema = data[0];
+                for (let i = 1; i < data.length; i++) {
+                    ema = alpha * data[i] + (1 - alpha) * ema;
+                }
+                return ema;
+            };
+            
+            return {
+                recent: calculateEMA(weeklyTotals.slice(-1), 1), // Current week
+                short: calculateEMA(weeklyTotals.slice(-2), 2/8), // 7-day EMA (2 weeks)
+                medium: calculateEMA(weeklyTotals.slice(-3), 2/15), // 14-day EMA (3 weeks) 
+                long: calculateEMA(weeklyTotals, 2/31) // 30-day EMA (5 weeks)
+            };
+        }
+
         function createSegmentedProgressBar(workoutBreakdown, totalSets, weeklyTarget, progressPercent) {
             if (workoutBreakdown.length === 0) {
                 // Empty progress bar
@@ -2077,7 +2173,7 @@
                 
                 // Goal fulfillment display
                 const fulfillmentText = isOverTarget && fulfillmentDays > 0 ? 
-                    `<div class="card-fulfillment">Goal met until ${new Date(Date.now() + fulfillmentDays * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>` : '';
+                    `<div class="card-fulfillment">Goal met until ${formatGoalDate(fulfillmentDays, true)}</div>` : '';
                 
                 card.innerHTML = `
                     <div class="muscle-name">${muscle}</div>
@@ -2465,7 +2561,6 @@
 
         // Exercise Modal Functions
         function showExercisesForMuscle(muscleName) {
-            console.log('Opening modal for:', muscleName);
             // Get muscle data for this muscle
             const data = muscleData[muscleName] || { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
             const workoutBreakdown = getWorkoutBreakdown(data);
@@ -2490,7 +2585,7 @@
             document.getElementById('exerciseModalTitle').textContent = muscleName;
             
             try {
-                console.log('Creating progress section...');
+
                 // Create detailed progress section
                 const segmentedProgressBar = createSegmentedProgressBar(workoutBreakdown, last7DaysData.sets, weeklyTarget, progressPercent);
                 
@@ -2513,22 +2608,45 @@
                     ).join('');
                     
                     const fulfillmentText = isOverTarget && fulfillmentDays > 0 ? 
-                        `<div class="fulfillment-info"><strong>Goal met until ${new Date(Date.now() + fulfillmentDays * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</strong></div>` : '';
+                        `<div class="fulfillment-info"><strong>Goal met until ${formatGoalDate(fulfillmentDays, false)}</strong></div>` : '';
+                    
+                    // Calculate EMA trends
+                    const emaData = calculateEMAWeeklyAverages(data);
+                    const trendsHtml = `
+                        <div class="trends-section">
+                            <h4>📊 Weekly Volume Trends</h4>
+                            <div class="trend-item">
+                                <span class="trend-label">Current week:</span>
+                                <span class="trend-value">${emaData.recent.toFixed(1)} sets/week</span>
+                            </div>
+                            <div class="trend-item">
+                                <span class="trend-label">Short-term (2-week):</span>
+                                <span class="trend-value">${emaData.short.toFixed(1)} sets/week</span>
+                            </div>
+                            <div class="trend-item">
+                                <span class="trend-label">Medium-term (3-week):</span>
+                                <span class="trend-value">${emaData.medium.toFixed(1)} sets/week</span>
+                            </div>
+                            <div class="trend-item">
+                                <span class="trend-label">Long-term (5-week):</span>
+                                <span class="trend-value">${emaData.long.toFixed(1)} sets/week</span>
+                            </div>
+                        </div>
+                    `;
                     
                     progressDetailHtml += `
                         <div class="modal-breakdown">
                             ${breakdownItems}
                             ${fulfillmentText}
+                            ${trendsHtml}
                         </div>
                     `;
                 }
                 
                 progressDetailHtml += `</div>`;
                 
-                console.log('Finding modal content elements...');
                 // Insert progress section before exercise list
                 const modalContent = document.querySelector('.exercise-modal-content');
-                console.log('Modal content found:', modalContent);
                 const existingProgress = modalContent.querySelector('.modal-progress-section');
                 if (existingProgress) {
                     existingProgress.remove();
@@ -2577,23 +2695,17 @@
             }
 
             // Show modal
-            console.log('Attempting to show modal...');
             const modal = document.getElementById('exerciseModal');
-            console.log('Modal element found:', modal);
             
             if (!modal) {
                 alert('ERROR: Modal element not found!');
                 return;
             }
             
-            console.log('Modal classList before:', modal.classList.toString());
             modal.classList.add('visible');
-            console.log('Modal classList after:', modal.classList.toString());
             
             // Force modal to be visible as backup
             modal.style.display = 'flex';
-            
-            console.log('Modal should now be visible');
             
             // Add haptic feedback
             if (window.addHapticFeedback) window.addHapticFeedback();
@@ -2601,11 +2713,9 @@
 
         function hideExerciseModal() {
             const modal = document.getElementById('exerciseModal');
-            console.log('Hiding modal:', modal, 'Has visible class:', modal.classList.contains('visible'));
             modal.classList.remove('visible');
             // Remove the inline display style that was set as a backup
             modal.style.display = '';
-            console.log('After hiding - Has visible class:', modal.classList.contains('visible'), 'Display style:', modal.style.display);
         }
 
         // Initialize close button event listener when DOM is ready
@@ -2613,7 +2723,6 @@
             const closeButton = document.getElementById('closeModalButton');
             if (closeButton) {
                 closeButton.addEventListener('click', function(event) {
-                    console.log('Close button clicked');
                     event.stopPropagation(); // Prevent event bubbling
                     hideExerciseModal();
                 });
