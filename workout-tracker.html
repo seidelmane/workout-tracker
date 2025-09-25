@@ -2614,38 +2614,55 @@
                     
                     // Calculate EMA trends
                     console.log('Calculating EMA for muscle data:', data.length, 'workouts');
-                    const emaData = calculateEMAWeeklyAverages(data);
-                    console.log('EMA data calculated:', emaData);
-                    const trendsHtml = `
-                        <div class="trends-section">
-                            <h4>📊 Weekly Volume Trends</h4>
-                            <div class="trend-item">
-                                <span class="trend-label">Current week:</span>
-                                <span class="trend-value">${emaData.recent.toFixed(1)} sets/week</span>
+                    let emaData;
+                    try {
+                        emaData = calculateEMAWeeklyAverages(data);
+                        console.log('EMA data calculated:', emaData);
+                    } catch (emaError) {
+                        console.error('EMA calculation failed:', emaError);
+                        // Fallback to simple averages if EMA fails
+                        emaData = { recent: 0, short: 0, medium: 0, long: 0 };
+                    }
+                    let trendsHtml = '';
+                    try {
+                        trendsHtml = `
+                            <div class="trends-section">
+                                <h4>📊 Weekly Volume Trends</h4>
+                                <div class="trend-item">
+                                    <span class="trend-label">Current week:</span>
+                                    <span class="trend-value">${(emaData.recent || 0).toFixed(1)} sets/week</span>
+                                </div>
+                                <div class="trend-item">
+                                    <span class="trend-label">Short-term (2-week):</span>
+                                    <span class="trend-value">${(emaData.short || 0).toFixed(1)} sets/week</span>
+                                </div>
+                                <div class="trend-item">
+                                    <span class="trend-label">Medium-term (3-week):</span>
+                                    <span class="trend-value">${(emaData.medium || 0).toFixed(1)} sets/week</span>
+                                </div>
+                                <div class="trend-item">
+                                    <span class="trend-label">Long-term (5-week):</span>
+                                    <span class="trend-value">${(emaData.long || 0).toFixed(1)} sets/week</span>
+                                </div>
                             </div>
-                            <div class="trend-item">
-                                <span class="trend-label">Short-term (2-week):</span>
-                                <span class="trend-value">${emaData.short.toFixed(1)} sets/week</span>
-                            </div>
-                            <div class="trend-item">
-                                <span class="trend-label">Medium-term (3-week):</span>
-                                <span class="trend-value">${emaData.medium.toFixed(1)} sets/week</span>
-                            </div>
-                            <div class="trend-item">
-                                <span class="trend-label">Long-term (5-week):</span>
-                                <span class="trend-value">${emaData.long.toFixed(1)} sets/week</span>
-                            </div>
-                        </div>
-                    `;
-                    console.log('Trends HTML created');
+                        `;
+                        console.log('Trends HTML created successfully');
+                    } catch (trendsError) {
+                        console.error('Failed to create trends HTML:', trendsError);
+                        trendsHtml = '<div class="trends-section"><p>Trends temporarily unavailable</p></div>';
+                    }
                     
                     progressDetailHtml += `
                         <div class="modal-breakdown">
                             ${breakdownItems}
                             ${fulfillmentText}
-                            ${trendsHtml}
                         </div>
                     `;
+                    
+                    // Temporarily disable trends for mobile debugging
+                    if (false) {
+                        progressDetailHtml = progressDetailHtml.replace('</div>    `;', trendsHtml + '</div>    `;');
+                    }
                 }
                 
                 progressDetailHtml += `</div>`;
