@@ -2466,7 +2466,6 @@
         // Exercise Modal Functions
         function showExercisesForMuscle(muscleName) {
             console.log('Opening modal for:', muscleName);
-            alert('Modal function called for: ' + muscleName); // Temporary debug
             // Get muscle data for this muscle
             const data = muscleData[muscleName] || { sets: 0, reps: 0, lastWorked: null, dailyData: {} };
             const workoutBreakdown = getWorkoutBreakdown(data);
@@ -2528,7 +2527,7 @@
                 
                 console.log('Finding modal content elements...');
                 // Insert progress section before exercise list
-                const modalContent = document.querySelector('.modal-content');
+                const modalContent = document.querySelector('.exercise-modal-content');
                 console.log('Modal content found:', modalContent);
                 const existingProgress = modalContent.querySelector('.modal-progress-section');
                 if (existingProgress) {
@@ -2540,7 +2539,7 @@
                 console.log('Progress section inserted');
             } catch (error) {
                 console.error('Error creating progress section:', error);
-                alert('Error in progress section: ' + error.message);
+                // Skip progress section on error, but still show modal
             }
             
             const exerciseList = document.getElementById('exerciseModalList');
