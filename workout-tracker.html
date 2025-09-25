@@ -2585,9 +2585,11 @@
             document.getElementById('exerciseModalTitle').textContent = muscleName;
             
             try {
+                console.log('Building progress section for:', muscleName, 'Sets:', last7DaysData.sets, 'Target:', weeklyTarget);
 
                 // Create detailed progress section
                 const segmentedProgressBar = createSegmentedProgressBar(workoutBreakdown, last7DaysData.sets, weeklyTarget, progressPercent);
+                console.log('Segmented progress bar created:', segmentedProgressBar ? 'SUCCESS' : 'FAILED');
                 
                 let progressDetailHtml = `
                     <div class="modal-progress-section">
@@ -2611,7 +2613,9 @@
                         `<div class="fulfillment-info"><strong>Goal met until ${formatGoalDate(fulfillmentDays, false)}</strong></div>` : '';
                     
                     // Calculate EMA trends
+                    console.log('Calculating EMA for muscle data:', data.length, 'workouts');
                     const emaData = calculateEMAWeeklyAverages(data);
+                    console.log('EMA data calculated:', emaData);
                     const trendsHtml = `
                         <div class="trends-section">
                             <h4>📊 Weekly Volume Trends</h4>
@@ -2633,6 +2637,7 @@
                             </div>
                         </div>
                     `;
+                    console.log('Trends HTML created');
                     
                     progressDetailHtml += `
                         <div class="modal-breakdown">
@@ -2644,6 +2649,9 @@
                 }
                 
                 progressDetailHtml += `</div>`;
+                
+                console.log('Final progress HTML length:', progressDetailHtml.length);
+                console.log('Progress HTML preview:', progressDetailHtml.substring(0, 200) + '...');
                 
                 // Insert progress section before exercise list
                 const modalContent = document.querySelector('.exercise-modal-content');
