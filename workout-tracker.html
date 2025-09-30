@@ -2958,74 +2958,33 @@
             }
         }
 
-        // Prevent mobile keyboard issues
+        // Simple mobile input focus management
         function fixMobileInputs() {
-            // Fix dropdown selection not interfering with inputs
+            // Auto-focus first input when exercise is selected
             document.querySelectorAll('.section-form select').forEach(select => {
                 select.addEventListener('change', (e) => {
-                    // Prevent the select change from affecting input focus
-                    e.stopPropagation();
-                    // Focus the first input after selection
-                    const form = select.closest('form');
-                    const firstInput = form.querySelector('input[type="number"]');
-                    if (firstInput && select.value) {
-                        // Mark that we're intentionally focusing an input
-                        firstInput.dataset.intentionalFocus = 'true';
-                        setTimeout(() => {
-                            firstInput.focus();
-                            // Clear the flag after focus is established
-                            setTimeout(() => {
-                                delete firstInput.dataset.intentionalFocus;
-                            }, 200);
-                        }, 150);
+                    if (select.value) {
+                        const form = select.closest('form');
+                        const firstInput = form.querySelector('input[type="number"]');
+                        if (firstInput) {
+                            // Use requestAnimationFrame for better timing
+                            requestAnimationFrame(() => {
+                                firstInput.focus();
+                                // Ensure the input is ready for mobile keyboards
+                                if (!firstInput.hasAttribute('inputmode')) {
+                                    firstInput.setAttribute('inputmode', 'numeric');
+                                }
+                            });
+                        }
                     }
                 });
             });
             
-            // Add listeners to prevent keyboard dismissal
+            // Ensure all number inputs have proper mobile keyboard support
             document.querySelectorAll('input[type="number"]').forEach(input => {
-                // Prevent blur unless user is actually done
-                let userInitiatedBlur = false;
-                let formSubmitting = false;
-                
-                // Track form submission to avoid focus conflicts
-                const form = input.closest('form');
-                if (form) {
-                    form.addEventListener('submit', () => {
-                        formSubmitting = true;
-                        userInitiatedBlur = true;
-                        // Reset form submitting flag after a short delay
-                        setTimeout(() => {
-                            formSubmitting = false;
-                        }, 500);
-                    });
+                if (!input.hasAttribute('inputmode')) {
+                    input.setAttribute('inputmode', 'numeric');
                 }
-                
-                input.addEventListener('touchstart', () => {
-                    if (!formSubmitting) {
-                        userInitiatedBlur = false;
-                    }
-                });
-                
-                input.addEventListener('focus', () => {
-                    if (!formSubmitting) {
-                        userInitiatedBlur = false;
-                    }
-                    // Ensure inputmode is set for mobile keyboards
-                    if (!input.hasAttribute('inputmode')) {
-                        input.setAttribute('inputmode', 'numeric');
-                    }
-                });
-                
-                // Removed aggressive blur prevention that was causing focus issues
-                // Let the browser handle blur naturally unless it's clearly unintentional
-                
-                // Mark blur as user-initiated for certain events
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === 'Tab') {
-                        userInitiatedBlur = true;
-                    }
-                });
             });
         }
 
