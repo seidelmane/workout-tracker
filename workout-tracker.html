@@ -2958,34 +2958,84 @@
             }
         }
 
-        // Simple mobile input focus management
+        // Simple mobile input focus management with debugging
         function fixMobileInputs() {
+            console.log('🔧 Setting up mobile input management...');
+            
             // Auto-focus first input when exercise is selected
-            document.querySelectorAll('.section-form select').forEach(select => {
+            document.querySelectorAll('.section-form select').forEach((select, index) => {
+                console.log(`📝 Found select element ${index}:`, select.id);
+                
                 select.addEventListener('change', (e) => {
+                    console.log('🎯 SELECT CHANGE EVENT:', {
+                        selectedValue: select.value,
+                        selectId: select.id,
+                        timestamp: new Date().toLocaleTimeString()
+                    });
+                    
                     if (select.value) {
                         const form = select.closest('form');
                         const firstInput = form.querySelector('input[type="number"]');
+                        
+                        console.log('🔍 Found elements:', {
+                            form: form ? form.id : 'no form',
+                            firstInput: firstInput ? firstInput.id : 'no input'
+                        });
+                        
                         if (firstInput) {
+                            console.log('⏰ Scheduling focus with requestAnimationFrame...');
+                            
                             // Use requestAnimationFrame for better timing
                             requestAnimationFrame(() => {
+                                console.log('🎯 ATTEMPTING FOCUS on:', firstInput.id);
+                                console.log('📱 Current activeElement before focus:', document.activeElement?.tagName);
+                                
                                 firstInput.focus();
+                                
+                                // Check focus result immediately
+                                console.log('📱 Current activeElement after focus:', document.activeElement?.tagName);
+                                console.log('✅ Focus attempt completed');
+                                
                                 // Ensure the input is ready for mobile keyboards
                                 if (!firstInput.hasAttribute('inputmode')) {
                                     firstInput.setAttribute('inputmode', 'numeric');
+                                    console.log('🔢 Added inputmode=numeric');
                                 }
+                                
+                                // Check focus again after a short delay
+                                setTimeout(() => {
+                                    console.log('🕐 Focus check after 100ms:', {
+                                        activeElement: document.activeElement?.tagName,
+                                        activeElementId: document.activeElement?.id,
+                                        isSameElement: document.activeElement === firstInput
+                                    });
+                                }, 100);
                             });
                         }
                     }
                 });
             });
             
-            // Ensure all number inputs have proper mobile keyboard support
-            document.querySelectorAll('input[type="number"]').forEach(input => {
+            // Debug all number inputs
+            document.querySelectorAll('input[type="number"]').forEach((input, index) => {
+                console.log(`🔢 Found number input ${index}:`, input.id);
+                
                 if (!input.hasAttribute('inputmode')) {
                     input.setAttribute('inputmode', 'numeric');
+                    console.log(`✅ Added inputmode to ${input.id}`);
                 }
+                
+                // Add focus/blur debugging
+                input.addEventListener('focus', () => {
+                    console.log(`🎯 FOCUS EVENT on ${input.id}:`, new Date().toLocaleTimeString());
+                });
+                
+                input.addEventListener('blur', () => {
+                    console.log(`🌫️ BLUR EVENT on ${input.id}:`, new Date().toLocaleTimeString());
+                });
             });
+            
+            console.log('✅ Mobile input management setup complete');
         }
 
         // Handle section-specific form submissions
@@ -3433,7 +3483,47 @@
         }
 
         // Initialize app
+        // Add global debugging for focus events
+        function addGlobalFocusDebugging() {
+            console.log('🌍 Adding global focus debugging...');
+            
+            // Track all focus changes
+            document.addEventListener('focusin', (e) => {
+                console.log('🌍 GLOBAL FOCUSIN:', {
+                    target: e.target.tagName,
+                    targetId: e.target.id,
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            });
+            
+            document.addEventListener('focusout', (e) => {
+                console.log('🌍 GLOBAL FOCUSOUT:', {
+                    target: e.target.tagName,
+                    targetId: e.target.id,
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            });
+            
+            // Track touch events that might interfere
+            document.addEventListener('touchstart', (e) => {
+                console.log('👆 TOUCHSTART:', {
+                    target: e.target.tagName,
+                    targetId: e.target.id,
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            });
+            
+            document.addEventListener('touchend', (e) => {
+                console.log('👆 TOUCHEND:', {
+                    target: e.target.tagName,
+                    targetId: e.target.id,
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            });
+        }
+
         function init() {
+            addGlobalFocusDebugging(); // Add debugging first
             loadData();
             loadTargets(); // Load custom targets and exercises from localStorage
             initMuscleData();
