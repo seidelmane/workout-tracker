@@ -2457,8 +2457,24 @@
                 setTimeout(() => scrollToSection(exerciseSection), 100);
             }
             
-            // Reset form
-            document.getElementById('exerciseForm').reset();
+            // Reset form and clear any form state
+            const form = document.getElementById('exerciseForm');
+            form.reset();
+            
+            // Ensure form inputs are properly reset and not disabled
+            const exerciseSelect = document.getElementById('exercise');
+            const setsInput = document.getElementById('sets');
+            const repsInput = document.getElementById('reps');
+            
+            // Clear values and ensure inputs are enabled
+            exerciseSelect.value = '';
+            setsInput.value = '';
+            repsInput.value = '';
+            
+            // Remove any focus to prevent stuck states
+            if (document.activeElement && (document.activeElement === setsInput || document.activeElement === repsInput)) {
+                document.activeElement.blur();
+            }
             
             // Show success feedback
             const btn = document.querySelector('.btn');
@@ -2964,13 +2980,31 @@
             document.querySelectorAll('input[type="number"]').forEach(input => {
                 // Prevent blur unless user is actually done
                 let userInitiatedBlur = false;
+                let formSubmitting = false;
+                
+                // Track form submission to avoid focus conflicts
+                const form = input.closest('form');
+                if (form) {
+                    form.addEventListener('submit', () => {
+                        formSubmitting = true;
+                        userInitiatedBlur = true;
+                        // Reset form submitting flag after a short delay
+                        setTimeout(() => {
+                            formSubmitting = false;
+                        }, 500);
+                    });
+                }
                 
                 input.addEventListener('touchstart', () => {
-                    userInitiatedBlur = false;
+                    if (!formSubmitting) {
+                        userInitiatedBlur = false;
+                    }
                 });
                 
                 input.addEventListener('focus', () => {
-                    userInitiatedBlur = false;
+                    if (!formSubmitting) {
+                        userInitiatedBlur = false;
+                    }
                     // Ensure inputmode is set for mobile keyboards
                     if (!input.hasAttribute('inputmode')) {
                         input.setAttribute('inputmode', 'numeric');
@@ -2978,10 +3012,13 @@
                 });
                 
                 input.addEventListener('blur', (e) => {
+                    // Don't interfere during form submission or reset
+                    if (formSubmitting) return;
+                    
                     // If this wasn't user-initiated, refocus
                     if (!userInitiatedBlur && document.activeElement !== input) {
                         setTimeout(() => {
-                            if (input.parentNode && input.value === '') {
+                            if (!formSubmitting && input.parentNode && input.value === '') {
                                 input.focus();
                             }
                         }, 50);
