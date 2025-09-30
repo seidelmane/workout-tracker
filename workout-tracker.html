@@ -2969,9 +2969,15 @@
                     const form = select.closest('form');
                     const firstInput = form.querySelector('input[type="number"]');
                     if (firstInput && select.value) {
+                        // Mark that we're intentionally focusing an input
+                        firstInput.dataset.intentionalFocus = 'true';
                         setTimeout(() => {
                             firstInput.focus();
-                        }, 100);
+                            // Clear the flag after focus is established
+                            setTimeout(() => {
+                                delete firstInput.dataset.intentionalFocus;
+                            }, 200);
+                        }, 150);
                     }
                 });
             });
@@ -3011,19 +3017,8 @@
                     }
                 });
                 
-                input.addEventListener('blur', (e) => {
-                    // Don't interfere during form submission or reset
-                    if (formSubmitting) return;
-                    
-                    // If this wasn't user-initiated, refocus
-                    if (!userInitiatedBlur && document.activeElement !== input) {
-                        setTimeout(() => {
-                            if (!formSubmitting && input.parentNode && input.value === '') {
-                                input.focus();
-                            }
-                        }, 50);
-                    }
-                });
+                // Removed aggressive blur prevention that was causing focus issues
+                // Let the browser handle blur naturally unless it's clearly unintentional
                 
                 // Mark blur as user-initiated for certain events
                 input.addEventListener('keydown', (e) => {
